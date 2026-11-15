@@ -76,7 +76,7 @@
   var TX = {
     uz: {
       t_multi: '📷 Ketma-ket skanerlash', t_one: '📷 Skanerlash',
-      s_multi: "Har bir quti/qurilmadagi SN shtrix-kodiga tuting. Material va EAN kodlarini ham ushlasa — model avtomatik aniqlanadi.",
+      s_multi: "Har bir quti/qurilmadagi SN shtrix-kodi yoki QR kodiga tuting. Material, EAN, MAC va Wi-Fi QR ni ham ushlasa — o'sha qurilmaga biriktiriladi.",
       s_one: 'SN shtrix-kodiga tuting — topilishi bilan botga yuboriladi.',
       torch_on: '🔦 Chiroq', torch_off: '🔦 O\'chirish', manual: '✍️ Qo\'lda', ph: 'SN yozing',
       empty: 'Hali hech narsa skanerlanmadi', send: 'Yuborish', added: '✅ Qo\'shildi: ', dup: '↺ Allaqachon ro\'yxatda: ',
@@ -86,7 +86,7 @@
     },
     ru: {
       t_multi: '📷 Сканирование подряд', t_one: '📷 Сканирование',
-      s_multi: 'Наводите на штрих-код SN каждой коробки/устройства. Если поймает код материала или EAN — модель определится автоматически.',
+      s_multi: 'Наводите на штрих-код или QR с SN каждой коробки/устройства. Код материала, EAN, MAC и Wi-Fi QR тоже привяжутся к этому устройству.',
       s_one: 'Наведите на штрих-код SN — как только найдётся, отправится в бот.',
       torch_on: '🔦 Фонарь', torch_off: '🔦 Выключить', manual: '✍️ Вручную', ph: 'Введите SN',
       empty: 'Пока ничего не отсканировано', send: 'Отправить', added: '✅ Добавлено: ', dup: '↺ Уже в списке: ',
@@ -107,20 +107,54 @@
   document.documentElement.lang = LANG;
 
   // ---------- Kodni ajratish (bot ham xuddi shunday tekshiradi) ----------
-  function classify(raw) {
-    var t = String(raw || '').trim().toUpperCase();
+  var MODEL_RE = /^(I?DS|CS|DH|DHI|IPC|NVR|DVR|PTZ|THC|XVR|HAC|SD)-[A-Z0-9]/;
+  function eanOk(d) {   // EAN-13 / UPC-A nazorat raqami
+    if (d.length === 12) d = '0' + d;
+    if (d.length !== 13) return false;
+    var s = 0; for (var i = 0; i < 12; i++) s += (+d.charAt(i)) * (i % 2 ? 3 : 1);
+    return (10 - s % 10) % 10 === +d.charAt(12);
+  }
+  function wifiParse(t) {   // WIFI:T:WPA;S:nom;P:parol;;
+    var out = {}, re = /([TSPH]):((?:\\.|[^;])*);/g, m;
+    while ((m = re.exec(t.slice(5)))) out[m[1]] = m[2].replace(/\\(.)/g, '$1');
+    return out.S ? { k: 'wifi', ssid: out.S, wpass: out.P || '' } : null;
+  }
+  function classify(raw, fmt) {
+    var orig = String(raw || '').trim();
+    if (/^WIFI:/i.test(orig)) return wifiParse(orig);
+    // Ko'p qatorli QR (EZVIZ/Hikvision qurilma yorlig'i): sayt \r SN \r verification \r model
+    if (/[\r\n]/.test(orig)) {
+      var parts = orig.split(/[\r\n]+/).map(function (x) { return x.trim().toUpperCase(); }).filter(Boolean);
+      var r = { k: 'sn', v: '', ver: '', model: '' };
+      parts.forEach(function (x) {
+        if (/\./.test(x) && !/\d{6}/.test(x)) return;               // www.ezviz.com
+        if (!r.model && MODEL_RE.test(x)) { r.model = x; return; }
+        if (!r.ver && /^[A-Z]{6}$/.test(x)) { r.ver = x; return; }
+        if (!r.v) { var c = classify(x, 'Code128'); if (c && c.k === 'sn') r.v = c.v; }
+      });
+      return r.v ? r : null;
+    }
+    var t = orig.toUpperCase();
     var u = t.replace(/[()\s]/g, '');
-    if (/^\d{9}$/.test(u) && u.charAt(0) === '3') return { k: 'mat', v: u };          // Hikvision material kodi
-    if (/^\d{13}$/.test(u) || /^\d{12}$/.test(u) || /^\d{8}$/.test(u) && /^(69|46|47|48)/.test(u)) return { k: 'ean', v: u };
-    if (u.length > 14 && /^I?DS-/.test(u) && /[A-Z]\d{8}$|[A-Z]{2}\d{7}$/.test(u)) return { k: 'sn', v: u.slice(-9) };   // Hikvision to'liq seriya → oxirgi 9 belgi
-    if (/^[A-Z]{1,2}\d{6,8}$/.test(u)) return { k: 'sn', v: u };                       // Hikvision / HiLook
-    if (/^[0-9A-Z]{15,16}$/.test(u) && /[A-Z]/.test(u) && /\d/.test(u)) return { k: 'sn', v: u }; // Dahua va boshqalar
-    if (/^\d{7,10}$/.test(u)) return { k: 'sn', v: u };                                 // eski DVR (faqat raqam)
+    var f = String(fmt || '');
+    if (/^([0-9A-F]{2}[:\-]){5}[0-9A-F]{2}$/.test(u) || (/^[0-9A-F]{12}$/.test(u) && /[A-F]/.test(u))) return { k: 'mac', v: u.replace(/[:\-]/g, '') };
+    if (/^\d+$/.test(u)) {
+      if (/^(EAN|UPC)/.test(f)) return { k: 'ean', v: u };
+      if (u.length === 9 && u.charAt(0) === '3') return { k: 'mat', v: u };   // Hikvision material kodi
+      if (!f && (u.length === 13 || u.length === 12) && eanOk(u)) return { k: 'ean', v: u };
+      if (!f && u.length === 8 && /^(69|46|47|48)/.test(u)) return { k: 'ean', v: u };
+      if (u.length >= 6 && u.length <= 16) return { k: 'sn', v: u };         // raqamli SN (ZTE, eski DVR)
+      return null;
+    }
+    if (u.length > 14 && /^I?DS-/.test(u) && /[A-Z]\d{8}$|[A-Z]{2}\d{7}$/.test(u)) return { k: 'sn', v: u.slice(-9) };
+    if (MODEL_RE.test(u)) return null;                                          // model nomi — SN emas
+    if (/^[A-Z]{1,2}\d{6,8}$/.test(u)) return { k: 'sn', v: u };
+    if (/^[0-9A-Z]{15,16}$/.test(u) && /[A-Z]/.test(u) && /\d/.test(u)) return { k: 'sn', v: u };
     if (/^[A-Z0-9][A-Z0-9\-\/]{5,24}$/.test(u) && /[A-Z]/.test(u) && /\d/.test(u)) return { k: 'sn', v: u };
     return null;
   }
 
-  var items = [];        // {sn, mat, ean, t}
+  var items = [];        // {sn, mat, ean, mac, ver, model, ssid, wpass, t}
   var pending = {};      // SN'dan oldin ushlangan kodlar
   var seen = {};
   var lastAt = 0;
@@ -136,8 +170,12 @@
       var n = document.createElement('span'); n.className = 'n'; n.textContent = (i + 1) + '.';
       var s = document.createElement('span'); s.className = 'sn'; s.textContent = it.sn;
       var tags = [];
+      if (it.model) tags.push(it.model);
+      if (it.ver) tags.push('ver ' + it.ver);
       if (it.mat) tags.push(TX.tag_mat + ' ' + it.mat);
       if (it.ean) tags.push(TX.tag_ean + ' ' + it.ean);
+      if (it.mac) tags.push('MAC ' + it.mac);
+      if (it.ssid) tags.push('Wi-Fi ' + it.ssid);
       if (tags.length) { var tg2 = document.createElement('span'); tg2.className = 'tag'; tg2.textContent = tags.join(' · '); s.appendChild(tg2); }
       var x = document.createElement('button'); x.className = 'x'; x.textContent = '✕';
       x.onclick = function () { delete seen['sn:' + it.sn]; items.splice(i, 1); render(); };
@@ -157,38 +195,52 @@
   function send() {
     if (sent || !items.length) return;
     sent = true;
-    var payload = JSON.stringify({ v: 1, m: MODE, items: items.slice(0, 60).map(function (x) { return { sn: x.sn, mat: x.mat || '', ean: x.ean || '' }; }) });
+    var payload = JSON.stringify({ v: 1, m: MODE, items: items.slice(0, 40).map(function (x) {
+      return { sn: x.sn, mat: x.mat || '', ean: x.ean || '', mac: x.mac || '', ver: x.ver || '', model: x.model || '', ssid: x.ssid || '', wpass: x.wpass || '' };
+    }) });
     stop();
     if (tg && tg.sendData) tg.sendData(payload); else alert(payload);
   }
 
-  function onCode(raw) {
-    var c = classify(raw);
+  function attach(it, c) {
+    if (c.k === 'wifi') { if (it.ssid) return false; it.ssid = c.ssid; it.wpass = c.wpass; return true; }
+    if (it[c.k]) return false;
+    it[c.k] = c.v; return true;
+  }
+  function onCode(raw, fmt) {
+    var c = classify(raw, fmt);
     if (!c) return;
-    var key = c.k + ':' + c.v;
+    var key = c.k + ':' + (c.k === 'wifi' ? c.ssid : c.v);
     var now = Date.now();
     if (c.k === 'sn') {
       if (seen[key]) { if (now - (seen[key]) > 2500) { flash(TX.dup + c.v, 'warn'); seen[key] = now; } return; }
       seen[key] = now;
-      var it = { sn: c.v, mat: pending.mat || '', ean: pending.ean || '', t: now };
+      var it = { sn: c.v, t: now };
+      ['mat', 'ean', 'mac'].forEach(function (k) { if (pending[k]) it[k] = pending[k]; });
+      if (pending.ssid) { it.ssid = pending.ssid; it.wpass = pending.wpass; }
+      if (c.ver) it.ver = c.ver;
+      if (c.model) it.model = c.model;
       pending = {};
       items.push(it); lastAt = now;
       haptic('success'); flash(TX.added + c.v, 'ok'); render();
       return true;
     }
-    // Material / EAN — oxirgi SN ga (6 soniya ichida) yoki keyingi SN ga biriktiriladi
+    // Material / EAN / MAC / Wi-Fi — oxirgi SN ga (6 soniya ichida) yoki keyingi SN ga biriktiriladi
     if (seen[key] && now - seen[key] < 4000) return;
     seen[key] = now;
     var last = items[items.length - 1];
-    if (last && now - lastAt < 6000 && !last[c.k]) { last[c.k] = c.v; flash(TX.extra + c.v, 'ok'); render(); haptic('success'); return true; }
-    pending[c.k] = c.v; flash(TX.only_code, 'warn');
+    var label = c.k === 'wifi' ? 'Wi-Fi ' + c.ssid : c.v;
+    if (last && now - lastAt < 6000 && attach(last, c)) { flash(TX.extra + label, 'ok'); render(); haptic('success'); return true; }
+    if (c.k === 'wifi') { pending.ssid = c.ssid; pending.wpass = c.wpass; } else pending[c.k] = c.v;
+    flash(TX.only_code, 'warn');
   }
 
   // ---------- Kamera (ZXing-C++ WebAssembly: bitta kadrdan bir nechta kod) ----------
-  var stream = null, track = null, torchOn = false, running = false, busy = false;
+  var stream = null, track = null, torchOn = false, running = false, busy = false, tick = 0;
   var canvas = document.createElement('canvas'), cctx = canvas.getContext('2d', { willReadFrequently: true });
   var OPTS = { tryHarder: true, maxNumberOfSymbols: 6,
     formats: ['Code128', 'Code39', 'Code93', 'EAN13', 'EAN8', 'UPCA', 'ITF', 'QRCode', 'DataMatrix'] };
+  var OPTS2 = Object.assign({}, OPTS, { binarizer: 'GlobalHistogram', tryDenoise: true });
   function stop() { running = false; try { stream && stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {} }
   function hit() { var f = $('frame'); f.classList.add('hit'); setTimeout(function () { f.classList.remove('hit'); }, 350); }
   function loop() {
@@ -196,20 +248,22 @@
     var v = $('video');
     if (!busy && v.readyState >= 2 && v.videoWidth) {
       busy = true;
-      // Ramka ichidagi qism (kenglik 92%, balandlik 56%) — tezroq va aniqroq
+      // Navbat bilan: ramka ichi (mayda shtrix-kodlar uchun aniqroq) va butun kadr (katta QR uchun)
+      var mode = tick++ % 3, full = mode > 0;   // 0: ramka ichi, 1: butun kadr, 2: butun kadr (boshqa binarizator — xira/egri QR uchun)
       var vw = v.videoWidth, vh = v.videoHeight;
-      var sx = Math.floor(vw * 0.04), sy = Math.floor(vh * 0.22), sw = Math.floor(vw * 0.92), sh = Math.floor(vh * 0.56);
+      var sx = full ? 0 : Math.floor(vw * 0.04), sy = full ? 0 : Math.floor(vh * 0.22);
+      var sw = full ? vw : Math.floor(vw * 0.92), sh = full ? vh : Math.floor(vh * 0.56);
       var scale = Math.min(1, 1600 / sw);
       canvas.width = Math.floor(sw * scale); canvas.height = Math.floor(sh * scale);
       cctx.drawImage(v, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
       var img = cctx.getImageData(0, 0, canvas.width, canvas.height);
-      ZXingWASM.readBarcodes(img, OPTS).then(function (res) {
+      ZXingWASM.readBarcodes(img, mode === 2 ? OPTS2 : OPTS).then(function (res) {
         busy = false;
         var got = false;
         // Avval SN, keyin material/EAN — bitta qutidagi kodlar bir-biriga biriktiriladi
         var list = (res || []).filter(function (r) { return r.isValid !== false && r.text; });
-        list.sort(function (a, b) { var A = classify(a.text), B = classify(b.text); return (A && A.k === 'sn' ? 0 : 1) - (B && B.k === 'sn' ? 0 : 1); });
-        list.forEach(function (r) { if (onCode(r.text)) got = true; });
+        list.sort(function (a, b) { var A = classify(a.text, a.format), B = classify(b.text, b.format); return (A && A.k === 'sn' ? 0 : 1) - (B && B.k === 'sn' ? 0 : 1); });
+        list.forEach(function (r) { if (onCode(r.text, r.format)) got = true; });
         if (got) hit();
         if (MODE === 'one' && items.length) setTimeout(send, 250);   // shu kadrdagi model kodlari ham ulgursin
       }).catch(function () { busy = false; });
@@ -242,8 +296,8 @@
   $('manualAdd').onclick = function () {
     var v = $('manualIn').value.trim().toUpperCase();
     if (!v) return;
-    var c = classify(v);
-    if (c && c.k === 'sn') { onCode(v); if (MODE === 'one') send(); }
+    var c = classify(v, 'Code128');
+    if (c && c.k === 'sn') { onCode(v, 'Code128'); if (MODE === 'one') send(); }
     else if (!seen['sn:' + v]) {   // qo'lda yozilgan noodatiy SN ham qabul qilinadi
       seen['sn:' + v] = Date.now(); items.push({ sn: v, t: Date.now() }); lastAt = Date.now(); render(); if (MODE === 'one') send();
     }
