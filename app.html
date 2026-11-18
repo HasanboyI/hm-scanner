@@ -55,6 +55,31 @@ textarea{min-height:70px;resize:vertical}
 .step span{font-size:13.5px}.step div{display:flex;align-items:center;gap:12px}.step button{width:34px;height:34px;border-radius:10px;background:var(--chip);font-size:18px}.step b{min-width:20px;text-align:center}
 .lnk{word-break:break-all;font-size:12.5px;color:var(--acc)}
 a{color:var(--acc);text-decoration:none}
+.bv{display:flex;flex-direction:column;min-height:100vh}
+.bv .hd{padding:10px 16px}.bv .hd img{height:34px}
+.cards{flex:1;padding:6px 0 150px}
+.mc{margin:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
+.mc.me{background:var(--chip);margin-left:48px;font-size:13px;color:var(--mut)}
+.mc img.ph{max-width:100%;border-radius:10px;display:block;margin-bottom:8px;background:#fff}
+.mc pre,.mc code{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--chip);border-radius:6px;padding:1px 5px}
+.mc pre{padding:8px;white-space:pre-wrap}
+.mc .sp{background:var(--mut);color:transparent;border-radius:4px;cursor:pointer}.mc .sp.on{background:none;color:inherit}
+.mc .ikb{display:flex;flex-direction:column;gap:6px;margin-top:10px}.mc .ikr{display:flex;gap:6px}
+.mc .ikr button{flex:1;background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:8px 6px;font-size:12.5px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.mc .ttl{font-size:11px;color:var(--sos);font-weight:700;margin-top:6px}
+.mc.gone{color:var(--mut);font-style:italic}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.bar .in{display:flex;gap:6px;align-items:center}
+.bar input[type=text]{flex:1;margin:0;width:auto;padding:10px 12px}
+.bar .ib{width:40px;height:40px;border-radius:12px;background:var(--chip);font-size:18px;flex:none}
+.bar .ib.p{background:var(--pri);color:var(--pritx)}
+.rkb{display:none;max-height:42vh;overflow:auto;margin-bottom:8px}.rkb.on{display:block}
+.rkb .r{display:flex;gap:6px;margin-bottom:6px}.rkb .r button{flex:1;background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:10px 6px;font-size:13px;font-weight:600}
+.busy{margin:10px 12px;color:var(--mut);font-size:13px}
+.ov{position:fixed;inset:0;background:#000;z-index:20;display:flex;flex-direction:column}
+.ov iframe{flex:1;border:0;width:100%;background:#fff}
+.ov .x{background:#111;color:#fff;padding:12px;text-align:center;font-weight:600}
+.srch{display:flex;gap:8px;margin:12px}.srch input{flex:1;margin:0;width:auto}.srch button{background:var(--pri);color:var(--pritx);border-radius:12px;padding:0 16px;font-weight:700}
 </style></head>
 <body><div id="app"></div><div class="toast" id="toast"></div>
 <script>
@@ -65,30 +90,30 @@ var API = Q.get('api') || '';
 var LOGO = 'data:image/jpeg;base64,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';
 var D = null, L = Q.get('l') || 'uz', stack = [];
 var TX = {
-uz: { tag: 'Kuzatuv tizimlari va tarmoq', s_done: 'bajarilgan ish', s_dev: "o'rnatilgan qurilma", s_obj: 'obyekt', hi: 'Assalomu alaykum, {0}!', since: 'Siz bilan {0}-yildan beri', last: 'Oxirgi xizmat: {0}', war: '🛡 Garantiya: {0} kun qoldi', sos: 'Usta chaqirish', sos_s: "Muammoni tanlang — 30 soniya. Ovozli xabar ham bo'ladi", objs: 'Obyektlarim', objs_s: '{0} obyekt · {1} kamera', reqs: 'Mening ishlarim', reqs_s: "so'rovlar va holati", calc: 'Narx hisoblash', calc_s: '3 xil variant', wc: 'Kafolat taloni', wc_s: 'PDF — chatga', ref: "Do'st taklif qiling", ref_s: 'bonus oling', ct: "Bog'lanish", ct_s: "qo'ng'iroq · Telegram", active: '{0} faol',
+uz: { tag: 'Kuzatuv tizimlari va tarmoq', s_done: 'bajarilgan ish', s_dev: "o'rnatilgan qurilma", s_obj: 'obyekt', hi: 'Assalomu alaykum, {0}!', since: 'Siz bilan {0}-yildan beri', last: 'Oxirgi xizmat: {0}', war: '🛡 Garantiya: {0} kun qoldi', sos: 'Usta chaqirish', sos_s: "Muammoni tanlang — 30 soniya. Ovozli xabar ham bo'ladi", objs: 'Obyektlarim', objs_s: '{0} obyekt · {1} kamera', reqs: 'Mening ishlarim', reqs_s: "so'rovlar va holati", calc: 'Narx hisoblash', calc_s: '3 xil variant', wc: 'Kafolat taloni', wc_s: 'PDF', ref: "Do'st taklif qiling", ref_s: 'bonus oling', ct: "Bog'lanish", ct_s: "qo'ng'iroq · Telegram", active: '{0} faol',
   f_obj: 'Obyekt', f_kind: 'Muammo nima?', f_when: 'Qachon qulay?', w_today: 'Bugun', w_tom: 'Ertaga', w_agree: 'Kelishamiz', f_note: 'Izoh (ixtiyoriy)', f_ph: "Masalan: 2-kamera tunda ko'rsatmayapti", f_media: "🎤 Ovozli xabar, rasm yoki video — yuborgach chatga tashlang, so'rovga qo'shiladi.", send: '✅ Yuborish', pick_kind: 'Muammo turini tanlang',
   sent: "✅ So'rov yuborildi", sent_s: "{0} · Usta tez orada bog'lanadi. Holatini «Mening ishlarim»da kuzatasiz.", home: '🏠 Bosh sahifa', to_chat: '💬 Chatga o\'tish',
   k: { cam: "📹 Kamera ko'rsatmayapti", app: '📱 Telefonda ochilmayapti', pw: '🔑 Parolni unutdim', net: '🌐 Internet / Wi-Fi', new: "➕ Qo'shimcha kamera", other: '✍️ Boshqa' },
   st: { yangi: 'Yangi', qabul: 'Qabul qilindi', "yo'lda": "Usta yo'lda", bajarildi: 'Bajarildi', bekor: 'Bekor' },
-  no_reqs: "Hali so'rov yo'q.", war_end: 'Garantiya: {0} gacha', war_none: "Garantiya ma'lumoti yo'q", devs: 'Qurilmalar', wifi: '📶 Wi-Fi QR (chatga)', pw: '🔑 Parollar (chatga, 60 s)', wcb: '🎫 Kafolat taloni', call: '🆘 Usta chaqirish',
-  c_total: 'Nechta kamera kerak?', c_out: "Ko'chaga (tashqi)", c_in: 'Ichkariga', c_aud: '🎤 Ovozli (mikrofonli)', c_col: '🌙 Tunda rangli', c_hi: '🔍 Juda aniq (4K)', c_go: '💰 Hisoblash', c_note: 'Natija (3 variant, rasmlari bilan) chatga keladi.',
+  no_reqs: "Hali so'rov yo'q.", war_end: 'Garantiya: {0} gacha', war_none: "Garantiya ma'lumoti yo'q", devs: 'Qurilmalar', wifi: '📶 Wi-Fi QR', pw: '🔑 Parollar (60 s)', wcb: '🎫 Kafolat taloni', call: '🆘 Usta chaqirish',
+  c_total: 'Nechta kamera kerak?', c_out: "Ko'chaga (tashqi)", c_in: 'Ichkariga', c_aud: '🎤 Ovozli (mikrofonli)', c_col: '🌙 Tunda rangli', c_hi: '🔍 Juda aniq (4K)', c_go: '💰 Hisoblash', c_note: 'Natija: 3 variant, rasmlari va narxlari bilan.',
   ref_t: 'Do\'stingizni taklif qiling', ref_p: "Havolani do'stingizga yuboring — u ulanganda sizga bonus.", share: '↗️ Ulashish', copy: '📋 Nusxa olish', copied: 'Nusxa olindi',
   ct_t: "Bog'lanish", chat: '💬 Botda yozish',
   g_t: 'Xush kelibsiz!', g_p: "Obyektlaringizni ko'rish uchun telefon raqamingizni ulashing — bazadagi raqamga mos kelsa, darhol ochiladi.", g_btn: '📱 Raqamni ulashish', g_wait: "✅ Raqam yuborildi. Tasdiqlanishi bilan bu yerda obyektlaringiz chiqadi.",
-  tasks: 'Mening vazifalarim', no_tasks: "Ochiq vazifa yo'q 👍", route: '🗺 Bugungi marshrut', oreqs: "Ochiq so'rovlar", no_oreqs: "Ochiq so'rov yo'q 👍", late: "muddati o'tgan", today: 'bugun', open: 'Ochish', done: '✅ Bajarildi', accept: '✅ Qabul qilish', onway: "🚗 Yo'ldaman", write: '💬 Mijozga yozish', media: '📎 Media', smeta: '📄 Smeta', invite: '📣 Taklif yuborish', loc: '📍',
-  to_chat_t: '✅ Chatga yuborildi', err: "Xatolik. Internetni tekshirib, qayta urinib ko'ring.", err_auth: 'Ilovani botdagi tugma orqali qayta oching.', err_cfg: "Ilova sozlanmagan (api manzili yo'q).", lang: "🌐 O'zbekcha · Русский" },
-ru: { tag: 'Видеонаблюдение и сети', s_done: 'выполненных работ', s_dev: 'установлено устройств', s_obj: 'объектов', hi: 'Здравствуйте, {0}!', since: 'С нами с {0} года', last: 'Последний сервис: {0}', war: '🛡 Гарантия: осталось {0} дн.', sos: 'Вызвать мастера', sos_s: 'Выберите проблему — 30 секунд. Можно голосовым', objs: 'Мои объекты', objs_s: '{0} объект · {1} камер', reqs: 'Мои заявки', reqs_s: 'заявки и их статус', calc: 'Расчёт цены', calc_s: '3 варианта', wc: 'Гарантийный талон', wc_s: 'PDF — в чат', ref: 'Пригласите друга', ref_s: 'получите бонус', ct: 'Контакты', ct_s: 'звонок · Telegram', active: '{0} активн.',
+  tasks: 'Mening vazifalarim', no_tasks: "Ochiq vazifa yo'q 👍", route: '🗺 Bugungi marshrut', oreqs: "Ochiq so'rovlar", no_oreqs: "Ochiq so'rov yo'q 👍", late: "muddati o'tgan", today: 'bugun', open: 'Ochish', done: '✅ Bajarildi', accept: '✅ Qabul qilish', onway: "🚗 Yo'ldaman", write: '💬 Mijozga yozish', media: '📎 Media', smeta: '📄 Smeta', invite: '📣 Taklif yuborish', newobj: "Yangi obyekt", panel: 'Boshqaruv', loc: '📍',
+  to_chat_t: '✅ Chatga yuborildi', all: "Barcha bo'limlar", all_s: 'bot menyusi — hammasi shu yerda', more: "Boshqa bo'limlar", more_s: 'bonus, til, aloqa…', ph_in: 'Yozing…', srch: 'Qidirish: nom, telefon, IP, SN', go: 'Topish', wait: '⏳ …', hidden: '🔒 Xavfsizlik uchun yashirildi', ttl_s: '🔒 {0} soniyadan keyin yashiriladi', doc_chat: '📄 Telegram chatga ham yuborildi', open_doc: "👁 Ko'rish", close: '✖️ Yopish', big: 'Fayl juda katta (20 MB gacha)', loc_err: "Joylashuvni olib bo'lmadi", err: "Xatolik. Internetni tekshirib, qayta urinib ko'ring.", err_auth: 'Ilovani botdagi tugma orqali qayta oching.', err_cfg: "Ilova sozlanmagan (api manzili yo'q).", lang: "🌐 O'zbekcha · Русский" },
+ru: { tag: 'Видеонаблюдение и сети', s_done: 'выполненных работ', s_dev: 'установлено устройств', s_obj: 'объектов', hi: 'Здравствуйте, {0}!', since: 'С нами с {0} года', last: 'Последний сервис: {0}', war: '🛡 Гарантия: осталось {0} дн.', sos: 'Вызвать мастера', sos_s: 'Выберите проблему — 30 секунд. Можно голосовым', objs: 'Мои объекты', objs_s: '{0} объект · {1} камер', reqs: 'Мои заявки', reqs_s: 'заявки и их статус', calc: 'Расчёт цены', calc_s: '3 варианта', wc: 'Гарантийный талон', wc_s: 'PDF', ref: 'Пригласите друга', ref_s: 'получите бонус', ct: 'Контакты', ct_s: 'звонок · Telegram', active: '{0} активн.',
   f_obj: 'Объект', f_kind: 'Что случилось?', f_when: 'Когда удобно?', w_today: 'Сегодня', w_tom: 'Завтра', w_agree: 'Договоримся', f_note: 'Комментарий (необязательно)', f_ph: 'Например: 2-я камера не показывает ночью', f_media: '🎤 Голосовое, фото или видео — после отправки пришлите в чат, оно добавится к заявке.', send: '✅ Отправить', pick_kind: 'Выберите тип проблемы',
   sent: '✅ Заявка отправлена', sent_s: '{0} · Мастер скоро свяжется. Статус — в «Мои заявки».', home: '🏠 Главная', to_chat: '💬 Перейти в чат',
   k: { cam: '📹 Камера не показывает', app: '📱 Не открывается в телефоне', pw: '🔑 Забыл пароль', net: '🌐 Интернет / Wi-Fi', new: '➕ Нужна ещё камера', other: '✍️ Другое' },
   st: { yangi: 'Новая', qabul: 'Принята', "yo'lda": 'Мастер в пути', bajarildi: 'Выполнена', bekor: 'Отменена' },
-  no_reqs: 'Заявок пока нет.', war_end: 'Гарантия до {0}', war_none: 'Нет данных о гарантии', devs: 'Устройства', wifi: '📶 Wi-Fi QR (в чат)', pw: '🔑 Пароли (в чат, 60 с)', wcb: '🎫 Гарантийный талон', call: '🆘 Вызвать мастера',
-  c_total: 'Сколько камер нужно?', c_out: 'На улицу', c_in: 'Внутрь', c_aud: '🎤 Со звуком (микрофон)', c_col: '🌙 Цветная ночью', c_hi: '🔍 Очень чёткая (4K)', c_go: '💰 Рассчитать', c_note: 'Результат (3 варианта с фото) придёт в чат.',
+  no_reqs: 'Заявок пока нет.', war_end: 'Гарантия до {0}', war_none: 'Нет данных о гарантии', devs: 'Устройства', wifi: '📶 Wi-Fi QR', pw: '🔑 Пароли (60 с)', wcb: '🎫 Гарантийный талон', call: '🆘 Вызвать мастера',
+  c_total: 'Сколько камер нужно?', c_out: 'На улицу', c_in: 'Внутрь', c_aud: '🎤 Со звуком (микрофон)', c_col: '🌙 Цветная ночью', c_hi: '🔍 Очень чёткая (4K)', c_go: '💰 Рассчитать', c_note: 'Результат: 3 варианта с фото и ценами.',
   ref_t: 'Пригласите друга', ref_p: 'Отправьте ссылку другу — когда он подключится, вы получите бонус.', share: '↗️ Поделиться', copy: '📋 Копировать', copied: 'Скопировано',
   ct_t: 'Контакты', chat: '💬 Написать в боте',
   g_t: 'Добро пожаловать!', g_p: 'Чтобы увидеть свои объекты, поделитесь номером телефона — если он есть в базе, всё откроется сразу.', g_btn: '📱 Поделиться номером', g_wait: '✅ Номер отправлен. После подтверждения здесь появятся ваши объекты.',
-  tasks: 'Мои задачи', no_tasks: 'Открытых задач нет 👍', route: '🗺 Маршрут на сегодня', oreqs: 'Открытые заявки', no_oreqs: 'Открытых заявок нет 👍', late: 'просрочена', today: 'сегодня', open: 'Открыть', done: '✅ Выполнено', accept: '✅ Принять', onway: '🚗 В пути', write: '💬 Написать клиенту', media: '📎 Медиа', smeta: '📄 Смета', invite: '📣 Приглашения', loc: '📍',
-  to_chat_t: '✅ Отправлено в чат', err: 'Ошибка. Проверьте интернет и попробуйте снова.', err_auth: 'Откройте приложение заново кнопкой в боте.', err_cfg: 'Приложение не настроено (нет адреса api).', lang: "🌐 O'zbekcha · Русский" }
+  tasks: 'Мои задачи', no_tasks: 'Открытых задач нет 👍', route: '🗺 Маршрут на сегодня', oreqs: 'Открытые заявки', no_oreqs: 'Открытых заявок нет 👍', late: 'просрочена', today: 'сегодня', open: 'Открыть', done: '✅ Выполнено', accept: '✅ Принять', onway: '🚗 В пути', write: '💬 Написать клиенту', media: '📎 Медиа', smeta: '📄 Смета', invite: '📣 Приглашения', newobj: 'Новый объект', panel: 'Управление', loc: '📍',
+  to_chat_t: '✅ Отправлено в чат', all: 'Все разделы', all_s: 'меню бота — всё здесь', more: 'Другие разделы', more_s: 'бонусы, язык, связь…', ph_in: 'Напишите…', srch: 'Поиск: название, телефон, IP, SN', go: 'Найти', wait: '⏳ …', hidden: '🔒 Скрыто в целях безопасности', ttl_s: '🔒 Скроется через {0} с', doc_chat: '📄 Также отправлено в чат Telegram', open_doc: '👁 Открыть', close: '✖️ Закрыть', big: 'Файл слишком большой (до 20 МБ)', loc_err: 'Не удалось получить геопозицию', err: 'Ошибка. Проверьте интернет и попробуйте снова.', err_auth: 'Откройте приложение заново кнопкой в боте.', err_cfg: 'Приложение не настроено (нет адреса api).', lang: "🌐 O'zbekcha · Русский" }
 };
 function T(k) { var s = (TX[L] || TX.uz)[k]; if (s == null) s = TX.uz[k] || k; var a = arguments; return typeof s === 'string' ? s.replace(/\{(\d)\}/g, function (m, i) { return a[+i + 1] != null ? a[+i + 1] : ''; }) : s; }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -109,16 +134,139 @@ function render(html) { $('app').innerHTML = html; window.scrollTo(0, 0); if (tg
 function go(fn, arg) { stack.push([fn, arg]); fn(arg); }
 function back() { stack.pop(); var p = stack[stack.length - 1]; if (p) p[0](p[1]); else { stack = []; home(); } }
 function root() { stack = []; home(); }
-/** Natijasi chatga keladigan amal: bajarib, ilovani yopamiz. */
-function run(d, close) {
-  hap('medium');
-  api('run', { d: d }).then(function (r) {
-    if (!r.ok) return toast(T('err'));
-    if (close === false) { toast(T('to_chat_t')); return load(); }
-    toast(T('to_chat_t')); setTimeout(function () { if (tg) tg.close(); }, 700);
-  }).catch(function () { toast(T('err')); });
+/** Har qanday bot amali — ilovaning o'zida (bot ekranida) bajariladi. */
+function run(d) { botView({ t: 'cb', d: d }); }
+
+// ---------------- 🤖 BOT EKRANI (chatdagi hamma narsa ilova ichida) ----------------
+var CARDS = [], MENU = null, BUSY = false, TTLS = {};
+function allowHtml(h) {
+  var x = String(h || '');
+  x = x.replace(/<(?!\/?(b|strong|i|em|u|ins|s|strike|del|code|pre|a|tg-spoiler|blockquote|br)\b)[^>]*>/gi, '');
+  x = x.replace(/<a\s+href="([^"]*)"[^>]*>/gi, function (m, u) { return /^(https?:|tg:)/i.test(u) ? '<a href="#" data-u="' + u.replace(/"/g, '&quot;') + '">' : '<a>'; });
+  x = x.replace(/<tg-spoiler>/gi, '<span class="sp">').replace(/<\/tg-spoiler>/gi, '</span>');
+  return x.replace(/\n/g, '<br>');
 }
-window.HM = { go: go, back: back, root: root, run: run };
+function cardHtml(c) {
+  if (c.gone) return '<div class="mc gone" id="c' + c.id + '">' + T('hidden') + '</div>';
+  var h = '';
+  if (c.k === 'photo' && c.src) h += '<img class="ph" src="' + c.src + '">';
+  if (c.k === 'doc') h += '<b>📄 ' + esc(c.name) + '</b><br><small>' + T('doc_chat') + '</small>' + (c.src ? '<div class="ikb"><div class="ikr"><button data-doc="' + c.id + '">' + T('open_doc') + '</button></div></div>' : '') + (c.html ? '<br>' : '');
+  if (c.k === 'loc') h += '<b>📍 ' + esc(c.title || '') + '</b><br><small>' + esc(c.addr || '') + '</small><div class="ikb"><div class="ikr"><button data-u="https://yandex.ru/maps/?pt=' + c.lon + ',' + c.lat + '&z=17&l=map">🗺 Yandex</button><button data-u="https://www.google.com/maps?q=' + c.lat + ',' + c.lon + '">🗺 Google</button></div></div>';
+  h += allowHtml(c.html);
+  var kb = c.kb && c.kb.inline_keyboard;
+  if (kb && kb.length) {
+    h += '<div class="ikb">' + kb.map(function (row, ri) {
+      return '<div class="ikr">' + row.map(function (b, bi) {
+        if (b.web_app && !/scan|index\.html|\?m=/.test(b.web_app.url)) return '';
+        return '<button data-c="' + c.id + '" data-r="' + ri + '" data-b="' + bi + '">' + esc(b.text) + '</button>';
+      }).join('') + '</div>';
+    }).join('') + '</div>';
+  }
+  if (c.ttl) h += '<div class="ttl" id="t' + c.id + '">' + T('ttl_s', c.ttl) + '</div>';
+  return '<div class="mc' + (c.me ? ' me' : '') + '" id="c' + c.id + '">' + h + '</div>';
+}
+function applyOut(out) {
+  (out || []).forEach(function (x) {
+    if (x.k === 'toast') { if (x.alert && tg && tg.showAlert) tg.showAlert(x.text); else toast(x.text); return; }
+    var i = CARDS.findIndex(function (c) { return c.id === x.id; });
+    if (x.k === 'del') { if (i >= 0) CARDS.splice(i, 1); return; }
+    if (x.k === 'kb') { if (i >= 0) CARDS[i].kb = x.kb; return; }
+    if (x.k === 'edit' || x.k === 'cap') { if (i >= 0) { CARDS[i].html = x.html; CARDS[i].kb = x.kb; return; } x.k = 'msg'; }
+    if (x.kb && x.kb.keyboard) { MENU = x.kb.keyboard; x.kb = null; }
+    if (x.kb && x.kb.remove_keyboard) x.kb = null;
+    if (x.k === 'msg' && !x.html && !x.kb) return;
+    CARDS.push(x);
+    if (x.ttl) startTtl(x);
+  });
+  if (CARDS.length > 40) CARDS = CARDS.slice(-40);
+}
+function startTtl(c) {
+  var left = c.ttl;
+  TTLS[c.id] = setInterval(function () {
+    left--; var e = $('t' + c.id); if (e) e.textContent = T('ttl_s', left);
+    if (left <= 0) { clearInterval(TTLS[c.id]); c.gone = true; c.src = ''; c.html = ''; c.kb = null; var el = $('c' + c.id); if (el) el.outerHTML = cardHtml(c); }
+  }, 1000);
+}
+function drawBot(scrollEnd) {
+  var menu = MENU ? '<div class="rkb" id="rkb">' + MENU.map(function (row, ri) { return '<div class="r">' + row.map(function (b, bi) { return '<button data-mr="' + ri + '" data-mb="' + bi + '">' + esc(b.text) + '</button>'; }).join('') + '</div>'; }).join('') + '</div>' : '';
+  render('<div class="bv">' + header(D ? D.brand : 'HM-Connect', T('all_s')) + '<div class="cards" id="cards">' + CARDS.map(cardHtml).join('') + (BUSY ? '<div class="busy">' + T('wait') + '</div>' : '') + '</div>' +
+    '<div class="bar">' + menu + '<div class="in"><button class="ib" id="bm">☰</button><button class="ib" id="ba">📎</button><input type="text" id="bi" placeholder="' + esc(T('ph_in')) + '"><button class="ib p" id="bs">➤</button></div>' +
+    '<input type="file" id="bf" accept="image/*,video/*,.pdf,.xlsx,.xls,.csv" style="display:none"></div></div>');
+  if (scrollEnd) setTimeout(function () { window.scrollTo(0, document.body.scrollHeight); }, 30);
+  $('bm').onclick = function () { var r = $('rkb'); if (r) r.classList.toggle('on'); else send({ t: 'text', text: '/menu' }); };
+  $('bs').onclick = function () { var v = $('bi').value.trim(); if (v) send({ t: 'text', text: v }); };
+  $('bi').onkeydown = function (e) { if (e.key === 'Enter') $('bs').click(); };
+  $('ba').onclick = function () { $('bf').click(); };
+  $('bf').onchange = function () {
+    var f = this.files[0]; if (!f) return;
+    if (f.size > 20 * 1024 * 1024) return toast(T('big'));
+    var rd = new FileReader(); rd.onload = function () { send({ t: 'file', b64: rd.result, name: f.name, caption: $('bi').value.trim() }, '📎 ' + f.name); }; rd.readAsDataURL(f);
+  };
+  $('cards').onclick = onCardClick;
+  if ($('rkb')) $('rkb').onclick = onMenuClick;
+}
+function onCardClick(e) {
+  var t = e.target.closest('button,a,.sp'); if (!t) return;
+  if (t.classList.contains('sp')) { t.classList.add('on'); return; }
+  if (t.dataset.u) { e.preventDefault(); return openUrl(t.dataset.u); }
+  if (t.dataset.doc) { var c = CARDS.find(function (x) { return String(x.id) === t.dataset.doc; }); if (c) openDoc(c); return; }
+  if (t.dataset.c) {
+    var c2 = CARDS.find(function (x) { return String(x.id) === t.dataset.c; }); if (!c2) return;
+    var b = c2.kb.inline_keyboard[+t.dataset.r][+t.dataset.b];
+    if (b.callback_data) { if (b.callback_data === 'noop') return; return send({ t: 'cb', d: b.callback_data, mid: c2.id }); }
+    if (b.url) return openUrl(b.url);
+    if (b.web_app) return openScanner(b.web_app.url);
+    if (b.copy_text) { try { navigator.clipboard.writeText(b.copy_text.text); toast(T('copied')); } catch (x) {} }
+  }
+}
+function onMenuClick(e) {
+  var t = e.target.closest('button[data-mr]'); if (!t) return;
+  var b = MENU[+t.dataset.mr][+t.dataset.mb];
+  $('rkb').classList.remove('on');
+  if (b.request_location) return getLoc();
+  if (b.request_contact) { if (tg && tg.requestContact) tg.requestContact(function () { setTimeout(function () { send({ t: 'text', text: '/menu' }); }, 1500); }); return; }
+  if (b.web_app) return openScanner(b.web_app.url);
+  send({ t: 'text', text: b.text });
+}
+function openUrl(u) { if (!tg) return window.open(u); if (/^https:\/\/t\.me\//.test(u)) tg.openTelegramLink(u); else tg.openLink(u); }
+function openDoc(c) {
+  try {
+    var b64 = c.src.split(',')[1], mime = c.src.slice(5, c.src.indexOf(';'));
+    var bin = atob(b64), arr = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    var url = URL.createObjectURL(new Blob([arr], { type: mime }));
+    overlay('<iframe src="' + url + '"></iframe>');
+  } catch (x) { toast(T('doc_chat')); }
+}
+function overlay(inner) {
+  var d = document.createElement('div'); d.className = 'ov'; d.innerHTML = inner + '<button class="x">' + T('close') + '</button>';
+  d.querySelector('.x').onclick = function () { d.remove(); window.removeEventListener('message', onScanMsg); };
+  document.body.appendChild(d); return d;
+}
+function onScanMsg(e) { if (e.data && e.data.hmScan) { var o = document.querySelector('.ov'); if (o) o.remove(); window.removeEventListener('message', onScanMsg); send({ t: 'wad', data: e.data.hmScan }, '📷'); } }
+function openScanner(u) { window.addEventListener('message', onScanMsg); overlay('<iframe allow="camera; microphone" src="' + u + (u.indexOf('?') >= 0 ? '&' : '?') + 'embed=1"></iframe>'); }
+function getLoc() {
+  function ok(lat, lon) { send({ t: 'loc', lat: lat, lon: lon }, '📍'); }
+  function viaBrowser() { if (!navigator.geolocation) return toast(T('loc_err')); navigator.geolocation.getCurrentPosition(function (p) { ok(p.coords.latitude, p.coords.longitude); }, function () { toast(T('loc_err')); }, { enableHighAccuracy: true, timeout: 15000 }); }
+  var lm = tg && tg.LocationManager;
+  if (lm && lm.init) { lm.init(function () { if (lm.isLocationAvailable) lm.getLocation(function (d) { if (d) ok(d.latitude, d.longitude); else viaBrowser(); }); else viaBrowser(); }); } else viaBrowser();
+}
+function send(q, echo) {
+  if (BUSY) return;
+  BUSY = true; hap();
+  if (q.t === 'text' && q.text !== '/menu') CARDS.push({ id: 'u' + Date.now(), me: true, html: esc(q.text) });
+  else if (echo) CARDS.push({ id: 'u' + Date.now(), me: true, html: esc(echo) });
+  drawBot(true);
+  api('m', q).then(function (r) {
+    BUSY = false;
+    if (!r.ok && !(r.out && r.out.length)) { toast(T('err')); return drawBot(true); }
+    applyOut(r.out); drawBot(true);
+  }).catch(function () { BUSY = false; toast(T('err')); drawBot(true); });
+}
+function botView(first) {
+  stack.push([function () { drawBot(false); }, null]);
+  if (first) send(first); else drawBot(true);
+}
+window.HM = { go: go, back: back, root: root, run: run, bot: function (txt) { botView(txt ? { t: 'text', text: txt } : null); } };
 
 // ---------------- MIJOZ ----------------
 function home() {
@@ -139,6 +287,7 @@ function home() {
     tile('🎫', T('wc'), T('wc_s'), c.objs.length === 1 ? "HM.run('cwc:" + c.objs[0].id + "')" : 'HM.go(HM.objs)') +
     tile('🎁', T('ref'), T('ref_s'), 'HM.go(HM.ref)') +
     tile('📞', T('ct'), T('ct_s'), 'HM.go(HM.contacts)') +
+    tile('☰', T('more'), T('more_s'), "HM.bot('/menu')") +
     '</div>' + langFoot() + '</div>');
 }
 function tile(ic, b, s, on) { return '<button class="it" onclick="' + on + '"><div class="ic">' + ic + '</div><b>' + b + '</b><small>' + esc(s) + '</small></button>'; }
@@ -206,7 +355,8 @@ function calc() {
       if (C.out) parts.push(C.out + " ta ko'chaga" + (C.col ? ' tunda rangli' : '') + (C.hi ? ' 4K' : ''));
       if (C.inn) parts.push(C.inn + ' ta ichkariga' + (C.aud ? ' ovozli' : '') + (C.col && !C.out ? ' tunda rangli' : '') + (C.hi ? ' 4K' : ''));
       $('cg').disabled = true;
-      api('calc', { text: n + ' ta kamera: ' + parts.join(', ') }).then(function (r) { if (!r.ok) { $('cg').disabled = false; return toast(T('err')); } toast(T('to_chat_t')); setTimeout(function () { tg && tg.close(); }, 700); }).catch(function () { $('cg').disabled = false; toast(T('err')); });
+      $('cg').textContent = '⏳';
+      api('calc', { text: n + ' ta kamera: ' + parts.join(', ') }).then(function (r) { if (!r.ok) { $('cg').disabled = false; return toast(T('err')); } applyOut(r.out); botView(null); }).catch(function () { $('cg').disabled = false; toast(T('err')); });
     };
   }
   function stp(k, lbl) { return '<div class="step"><span>' + lbl + '</span><div><button data-s="' + k + '" data-d="-1">−</button><b>' + C[k] + '</b><button data-s="' + k + '" data-d="1">+</button></div></div>'; }
@@ -240,17 +390,21 @@ function staffHome() {
       (x.obj ? '<p>🏢 ' + esc(x.obj) + '</p>' : '') + '<div class="acts"><button onclick="HM.run(\'tk:v:' + x.id + '\')">' + T('open') + '</button>' + (x.loc ? '<button onclick="HM.run(\'tk:loc:' + x.id + '\')">📍</button>' : '') + '<button class="p" onclick="HM.run(\'tk:done:' + x.id + '\')">' + T('done') + '</button></div></div>';
   }).join('') : '<div class="note">' + T('no_tasks') + '</div>';
   var reqs = s.reqs.length ? s.reqs.map(function (r) {
-    var a = r.st === 'yangi' ? '<button class="p" onclick="HM.run(\'rqa:' + r.id + '\',false)">' + T('accept') + '</button>' :
-      r.st === 'qabul' ? '<button onclick="HM.run(\'rqw:' + r.id + '\',false)">' + T('onway') + '</button><button class="p" onclick="HM.run(\'rqd:' + r.id + '\',false)">' + T('done') + '</button>' :
-      r.st === "yo'lda" ? '<button class="p" onclick="HM.run(\'rqd:' + r.id + '\',false)">' + T('done') + '</button>' : '';
+    var a = r.st === 'yangi' ? '<button class="p" onclick="HM.run(\'rqa:' + r.id + '\')">' + T('accept') + '</button>' :
+      r.st === 'qabul' ? '<button onclick="HM.run(\'rqw:' + r.id + '\')">' + T('onway') + '</button><button class="p" onclick="HM.run(\'rqd:' + r.id + '\')">' + T('done') + '</button>' :
+      r.st === "yo'lda" ? '<button class="p" onclick="HM.run(\'rqd:' + r.id + '\')">' + T('done') + '</button>' : '';
     return '<div class="li"><div class="t"><b>' + esc(r.id) + ' · ' + esc(r.obj) + '</b>' + pill(r.st) + '</div><p>👤 ' + esc(r.client) + ' · ' + esc(r.date) + '</p><p>' + esc(r.text) + '</p><div class="acts">' + a +
       '<button onclick="HM.run(\'rqm:' + r.id + '\')">' + T('write') + '</button>' + (r.media ? '<button onclick="HM.run(\'rqv:' + r.id + '\')">' + T('media') + '</button>' : '') + '</div></div>';
   }).join('') : '<div class="note">' + T('no_oreqs') + '</div>';
   render(header(D.brand, D.name) + '<div class="wrap">' +
-    '<div class="grid" style="margin-top:12px">' + tile('🗺', nt(T('route')), '', "HM.run('tk:route')") + tile('📄', nt(T('smeta')), '', "HM.run('sm:new')") + '</div>' +
+    '<div class="srch"><input type="text" id="sq" placeholder="' + esc(T('srch')) + '"><button id="sg">' + T('go') + '</button></div>' +
+    '<div class="grid">' + tile('☰', T('all'), T('all_s'), "HM.bot('/menu')") + tile('➕', T('newobj'), '', "HM.bot(" + JSON.stringify(D.staff.newObjBtn || '') .replace(/"/g, "'") + ")") + '</div><div style="height:10px"></div>' +
+    '<div class="grid">' + tile('🗺', nt(T('route')), '', "HM.run('tk:route')") + tile('📄', nt(T('smeta')), '', "HM.run('sm:new')") + '</div>' +
     '<div class="sec">' + T('oreqs') + ' (' + s.reqs.length + ')</div>' + reqs +
     '<div class="sec">' + T('tasks') + ' (' + s.tasks.length + ')</div>' + tasks +
-    (s.isSuper ? '<div class="grid" style="margin-top:12px">' + tile('📣', nt(T('invite')), '', "HM.run('iv:n')") + '</div>' : '') + langFoot() + '</div>');
+    (s.isSuper ? '<div class="grid" style="margin-top:12px">' + tile('📣', nt(T('invite')), '', "HM.run('iv:n')") + tile('👑', T('panel'), '', "HM.bot(" + JSON.stringify(D.staff.panelBtn || '').replace(/"/g, "'") + ")") + '</div>' : '') + langFoot() + '</div>');
+  $('sg').onclick = function () { var v = $('sq').value.trim(); if (v) botView({ t: 'text', text: v }); };
+  $('sq').onkeydown = function (e) { if (e.key === 'Enter') $('sg').click(); };
 }
 
 // ---------------- Yuklash ----------------

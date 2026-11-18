@@ -97,6 +97,7 @@
   }[LANG];
 
   var tg = window.Telegram && window.Telegram.WebApp;
+  if (Q.get('embed') === '1') tg = null;
   if (tg) { tg.ready(); tg.expand(); }
   var $ = function (id) { return document.getElementById(id); };
   $('title').textContent = MODE === 'one' ? TX.t_one : TX.t_multi;
@@ -199,6 +200,7 @@
       return { sn: x.sn, mat: x.mat || '', ean: x.ean || '', mac: x.mac || '', ver: x.ver || '', model: x.model || '', ssid: x.ssid || '', wpass: x.wpass || '' };
     }) });
     stop();
+    if (Q.get('embed') === '1' && window.parent !== window) { window.parent.postMessage({ hmScan: payload }, '*'); return; }   // HM-Connect ilovasi ichida
     if (tg && tg.sendData) tg.sendData(payload); else alert(payload);
   }
 
