@@ -91,7 +91,7 @@ var LOGO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEB
 var D = null, L = Q.get('l') || 'uz', stack = [];
 var TX = {
 uz: { tag: 'Kuzatuv tizimlari va tarmoq', s_done: 'bajarilgan ish', s_dev: "o'rnatilgan qurilma", s_obj: 'obyekt', hi: 'Assalomu alaykum, {0}!', since: 'Siz bilan {0}-yildan beri', last: 'Oxirgi xizmat: {0}', war: '🛡 Garantiya: {0} kun qoldi', sos: 'Usta chaqirish', sos_s: "Muammoni tanlang — 30 soniya. Ovozli xabar ham bo'ladi", objs: 'Obyektlarim', objs_s: '{0} obyekt · {1} kamera', reqs: 'Mening ishlarim', reqs_s: "so'rovlar va holati", calc: 'Narx hisoblash', calc_s: '3 xil variant', wc: 'Kafolat taloni', wc_s: 'PDF', ref: "Do'st taklif qiling", ref_s: 'bonus oling', ct: "Bog'lanish", ct_s: "qo'ng'iroq · Telegram", active: '{0} faol',
-  f_obj: 'Obyekt', f_kind: 'Muammo nima?', f_when: 'Qachon qulay?', w_today: 'Bugun', w_tom: 'Ertaga', w_agree: 'Kelishamiz', f_note: 'Izoh (ixtiyoriy)', f_ph: "Masalan: 2-kamera tunda ko'rsatmayapti", f_media: "🎤 Ovozli xabar, rasm yoki video — yuborgach chatga tashlang, so'rovga qo'shiladi.", send: '✅ Yuborish', pick_kind: 'Muammo turini tanlang',
+  f_obj: 'Obyekt', f_kind: 'Muammo nima?', f_when: 'Qachon qulay?', w_today: 'Bugun', w_tom: 'Ertaga', w_agree: 'Kelishamiz', f_note: 'Izoh (ixtiyoriy)', f_loc: '📍 Lokatsiyani qo\'shish (ixtiyoriy)', f_loc_ok: '✅ Lokatsiya qo\'shildi', f_ph: "Masalan: 2-kamera tunda ko'rsatmayapti", f_media: "🎤 Ovozli xabar, rasm yoki video — yuborgach chatga tashlang, so'rovga qo'shiladi.", send: '✅ Yuborish', pick_kind: 'Muammo turini tanlang',
   sent: "✅ So'rov yuborildi", sent_s: "{0} · Usta tez orada bog'lanadi. Holatini «Mening ishlarim»da kuzatasiz.", home: '🏠 Bosh sahifa', to_chat: '💬 Chatga o\'tish',
   k: { cam: "📹 Kamera ko'rsatmayapti", app: '📱 Telefonda ochilmayapti', pw: '🔑 Parolni unutdim', net: '🌐 Internet / Wi-Fi', new: "➕ Qo'shimcha kamera", other: '✍️ Boshqa' },
   st: { yangi: 'Yangi', qabul: 'Qabul qilindi', "yo'lda": "Usta yo'lda", bajarildi: 'Bajarildi', bekor: 'Bekor' },
@@ -103,7 +103,7 @@ uz: { tag: 'Kuzatuv tizimlari va tarmoq', s_done: 'bajarilgan ish', s_dev: "o'rn
   tasks: 'Mening vazifalarim', no_tasks: "Ochiq vazifa yo'q 👍", route: '🗺 Bugungi marshrut', oreqs: "Ochiq so'rovlar", no_oreqs: "Ochiq so'rov yo'q 👍", late: "muddati o'tgan", today: 'bugun', open: 'Ochish', done: '✅ Bajarildi', accept: '✅ Qabul qilish', onway: "🚗 Yo'ldaman", write: '💬 Mijozga yozish', media: '📎 Media', smeta: '📄 Smeta', invite: '📣 Taklif yuborish', newobj: "Yangi obyekt", panel: 'Boshqaruv', loc: '📍',
   to_chat_t: '✅ Chatga yuborildi', all: "Barcha bo'limlar", all_s: 'bot menyusi — hammasi shu yerda', more: "Boshqa bo'limlar", more_s: 'bonus, til, aloqa…', ph_in: 'Yozing…', srch: 'Qidirish: nom, telefon, IP, SN', go: 'Topish', wait: '⏳ …', hidden: '🔒 Xavfsizlik uchun yashirildi', ttl_s: '🔒 {0} soniyadan keyin yashiriladi', doc_chat: '📄 Telegram chatga ham yuborildi', open_doc: "👁 Ko'rish", close: '✖️ Yopish', big: 'Fayl juda katta (20 MB gacha)', loc_err: "Joylashuvni olib bo'lmadi", err: "Xatolik. Internetni tekshirib, qayta urinib ko'ring.", err_auth: 'Ilovani botdagi tugma orqali qayta oching.', err_cfg: "Ilova sozlanmagan (api manzili yo'q).", lang: "🌐 O'zbekcha · Русский" },
 ru: { tag: 'Видеонаблюдение и сети', s_done: 'выполненных работ', s_dev: 'установлено устройств', s_obj: 'объектов', hi: 'Здравствуйте, {0}!', since: 'С нами с {0} года', last: 'Последний сервис: {0}', war: '🛡 Гарантия: осталось {0} дн.', sos: 'Вызвать мастера', sos_s: 'Выберите проблему — 30 секунд. Можно голосовым', objs: 'Мои объекты', objs_s: '{0} объект · {1} камер', reqs: 'Мои заявки', reqs_s: 'заявки и их статус', calc: 'Расчёт цены', calc_s: '3 варианта', wc: 'Гарантийный талон', wc_s: 'PDF', ref: 'Пригласите друга', ref_s: 'получите бонус', ct: 'Контакты', ct_s: 'звонок · Telegram', active: '{0} активн.',
-  f_obj: 'Объект', f_kind: 'Что случилось?', f_when: 'Когда удобно?', w_today: 'Сегодня', w_tom: 'Завтра', w_agree: 'Договоримся', f_note: 'Комментарий (необязательно)', f_ph: 'Например: 2-я камера не показывает ночью', f_media: '🎤 Голосовое, фото или видео — после отправки пришлите в чат, оно добавится к заявке.', send: '✅ Отправить', pick_kind: 'Выберите тип проблемы',
+  f_obj: 'Объект', f_kind: 'Что случилось?', f_when: 'Когда удобно?', w_today: 'Сегодня', w_tom: 'Завтра', w_agree: 'Договоримся', f_note: 'Комментарий (необязательно)', f_loc: '📍 Добавить геопозицию (необязательно)', f_loc_ok: '✅ Геопозиция добавлена', f_ph: 'Например: 2-я камера не показывает ночью', f_media: '🎤 Голосовое, фото или видео — после отправки пришлите в чат, оно добавится к заявке.', send: '✅ Отправить', pick_kind: 'Выберите тип проблемы',
   sent: '✅ Заявка отправлена', sent_s: '{0} · Мастер скоро свяжется. Статус — в «Мои заявки».', home: '🏠 Главная', to_chat: '💬 Перейти в чат',
   k: { cam: '📹 Камера не показывает', app: '📱 Не открывается в телефоне', pw: '🔑 Забыл пароль', net: '🌐 Интернет / Wi-Fi', new: '➕ Нужна ещё камера', other: '✍️ Другое' },
   st: { yangi: 'Новая', qabul: 'Принята', "yo'lda": 'Мастер в пути', bajarildi: 'Выполнена', bekor: 'Отменена' },
@@ -244,8 +244,8 @@ function overlay(inner) {
 }
 function onScanMsg(e) { if (e.data && e.data.hmScan) { var o = document.querySelector('.ov'); if (o) o.remove(); window.removeEventListener('message', onScanMsg); send({ t: 'wad', data: e.data.hmScan }, '📷'); } }
 function openScanner(u) { window.addEventListener('message', onScanMsg); overlay('<iframe allow="camera; microphone" src="' + u + (u.indexOf('?') >= 0 ? '&' : '?') + 'embed=1"></iframe>'); }
-function getLoc() {
-  function ok(lat, lon) { send({ t: 'loc', lat: lat, lon: lon }, '📍'); }
+function getLoc() { pickLoc(function (lat, lon) { send({ t: 'loc', lat: lat, lon: lon }, '📍'); }); }
+function pickLoc(ok) {
   function viaBrowser() { if (!navigator.geolocation) return toast(T('loc_err')); navigator.geolocation.getCurrentPosition(function (p) { ok(p.coords.latitude, p.coords.longitude); }, function () { toast(T('loc_err')); }, { enableHighAccuracy: true, timeout: 15000 }); }
   var lm = tg && tg.LocationManager;
   if (lm && lm.init) { lm.init(function () { if (lm.isLocationAvailable) lm.getLocation(function (d) { if (d) ok(d.latitude, d.longitude); else viaBrowser(); }); else viaBrowser(); }); } else viaBrowser();
@@ -303,14 +303,16 @@ function sos(oid) {
     '<div class="sec">' + T('f_kind') + '</div><div class="chips" id="fk">' + c.kinds.map(function (k) { return '<button class="c" data-k="' + k + '">' + T('k')[k] + '</button>'; }).join('') + '</div>' +
     '<div class="sec">' + T('f_when') + '</div><div class="row" id="fw"><button class="c on" data-w="today">' + T('w_today') + '</button><button class="c" data-w="tom">' + T('w_tom') + '</button><button class="c" data-w="agree">' + T('w_agree') + '</button></div>' +
     '<div class="sec">' + T('f_note') + '</div><textarea id="fn" placeholder="' + esc(T('f_ph')) + '"></textarea>' +
+    '<button class="mbtn sec2" id="fl">' + T('f_loc') + '</button>' +
     '<div class="note">' + T('f_media') + '</div><button class="mbtn" id="fs">' + T('send') + '</button></div>');
   $('fk').onclick = function (e) { var b = e.target.closest('[data-k]'); if (!b) return; F.kind = b.dataset.k; [].forEach.call($('fk').children, function (x) { x.classList.toggle('on', x === b); }); hap(); };
   $('fw').onclick = function (e) { var b = e.target.closest('[data-w]'); if (!b) return; F.when = b.dataset.w; [].forEach.call($('fw').children, function (x) { x.classList.toggle('on', x === b); }); hap(); };
+  $('fl').onclick = function () { pickLoc(function (lat, lon) { F.lat = lat; F.lon = lon; $('fl').textContent = T('f_loc_ok'); hap(); }); };
   $('fs').onclick = function () {
     if (!F.kind) { hap('heavy'); return toast(T('pick_kind')); }
     if ($('fo')) F.oid = $('fo').value;
     $('fs').disabled = true; $('fs').textContent = '…';
-    api('req', { oid: F.oid, kind: F.kind, when: F.when, text: $('fn').value }).then(function (r) {
+    api('req', { oid: F.oid, kind: F.kind, when: F.when, text: $('fn').value, lat: F.lat, lon: F.lon }).then(function (r) {
       if (!r.ok) { $('fs').disabled = false; $('fs').textContent = T('send'); return toast(T('err')); }
       try { tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
       render('<div class="center"><div class="big">✅</div><h3>' + T('sent') + '</h3><p>' + esc(T('sent_s', r.id)) + '</p></div><button class="mbtn" onclick="HM.reload()">' + T('home') + '</button><button class="mbtn sec2" onclick="Telegram.WebApp.close()">' + T('to_chat') + '</button>');
