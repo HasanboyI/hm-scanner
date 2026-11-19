@@ -418,11 +418,12 @@ function sigPad(o) {
   var c = $('sgc'), r = c.getBoundingClientRect(), k = window.devicePixelRatio || 1;
   c.width = r.width * k; c.height = r.height * k;
   var x = c.getContext('2d'), drawn = false, down = false;
-  function clear() { x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.strokeStyle = '#10213a'; x.lineWidth = 2.6 * k; x.lineCap = 'round'; x.lineJoin = 'round'; drawn = false; }
+  function clear() { bx = [1e9, 1e9, -1e9, -1e9]; x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.strokeStyle = '#10213a'; x.lineWidth = 2.6 * k; x.lineCap = 'round'; x.lineJoin = 'round'; drawn = false; }
   function pt(e) { var b = c.getBoundingClientRect(); return [(e.clientX - b.left) * k, (e.clientY - b.top) * k]; }
   clear();
   c.onpointerdown = function (e) { down = true; var p = pt(e); x.beginPath(); x.moveTo(p[0], p[1]); c.setPointerCapture(e.pointerId); };
-  c.onpointermove = function (e) { if (!down) return; var p = pt(e); x.lineTo(p[0], p[1]); x.stroke(); drawn = true; };
+  var bx = [1e9, 1e9, -1e9, -1e9];
+  c.onpointermove = function (e) { if (!down) return; var p = pt(e); x.lineTo(p[0], p[1]); x.stroke(); drawn = true; bx = [Math.min(bx[0], p[0]), Math.min(bx[1], p[1]), Math.max(bx[2], p[0]), Math.max(bx[3], p[1])]; };
   c.onpointerup = c.onpointercancel = function () { down = false; };
   // iOS: barmoq harakati sahifani surmasin — faqat chiziq chizilsin
   ['touchstart', 'touchmove'].forEach(function (ev) { c.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false }); });
@@ -430,7 +431,10 @@ function sigPad(o) {
   $('sgx').onclick = clear;
   $('sgs').onclick = function () {
     if (!drawn) { hap('heavy'); return toast(T('sg_empty')); }
-    var png = c.toDataURL('image/png'), b = $('sgs'); b.disabled = true; b.textContent = '⏳';
+    // imzoni chetlaridagi bo'sh joysiz kesib olamiz — aktda chiziq ustida aniq turadi
+    var pad = 6 * k, cx = Math.max(0, bx[0] - pad), cy = Math.max(0, bx[1] - pad), cw = Math.min(c.width, bx[2] + pad) - cx, ch = Math.min(c.height, bx[3] + pad) - cy;
+    var cc = document.createElement('canvas'); cc.width = cw; cc.height = ch; var cx2 = cc.getContext('2d'); cx2.fillStyle = '#fff'; cx2.fillRect(0, 0, cw, ch); cx2.drawImage(c, cx, cy, cw, ch, 0, 0, cw, ch);
+    var png = cc.toDataURL('image/png'), b = $('sgs'); b.disabled = true; b.textContent = '⏳';
     var d = me ? 'sg:p' : 'aks:' + o.what + ':' + (o.al || L), out = [];
     api('m', { t: 'cb', d: d }).then(function (r1) { out = out.concat(r1.out || []); return api('m', { t: 'file', b64: png, name: 'imzo.png' }); })
       .then(function (r2) { out = out.concat(r2.out || []); if (!r2.ok && !(r2.out && r2.out.length)) { b.disabled = false; b.textContent = T('sg_save'); return toast(T('err')); } applyOut(out); stack.pop(); botView(null); })
