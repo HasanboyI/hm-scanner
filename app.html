@@ -8,7 +8,7 @@
 :root{--bg:#F3F4F6;--card:#FFFFFF;--tx:#1B2430;--mut:#6B7480;--line:#E4E7EB;--pri:#1F3A5F;--pritx:#fff;--acc:#2F6FB2;--chip:#EEF2F7;--sos:#B4423A;--ok:#2E7D5B;--warn:#B7791F}
 .dark{--bg:#0E1116;--card:#171B22;--tx:#E7EAEE;--mut:#8C95A1;--line:#252B34;--pri:#8FB3E0;--pritx:#0E1116;--acc:#5B9BE0;--chip:#1E242D;--sos:#C8564D;--ok:#4CAF84;--warn:#E0A84B}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px}
+html,body{margin:0;overscroll-behavior:none;background:var(--bg);color:var(--tx);font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .hd{background:linear-gradient(160deg,#07090C 0%,#141C28 60%,#1F3A5F 140%);padding:14px 16px 16px;color:#fff}
 .hd .top{display:flex;align-items:center;gap:10px}
@@ -413,7 +413,7 @@ function staffHome() {
 function sigPad(o) {
   var me = o.what === 'me';
   render(header(T('sg_t'), me ? D.name : o.what) + '<div class="wrap"><div class="note">' + (me ? T('sg_me') : T('sg_cl')) + '</div>' +
-    '<canvas id="sgc" style="width:100%;height:220px;background:#fff;border-radius:12px;touch-action:none;display:block;margin:10px 0"></canvas>' +
+    '<canvas id="sgc" style="width:100%;height:240px;overscroll-behavior:contain;background:#fff;border-radius:12px;touch-action:none;display:block;margin:10px 0"></canvas>' +
     '<div class="note" style="text-align:center">' + T('sg_hint') + '</div><div class="acts"><button id="sgx">' + T('sg_clear') + '</button><button class="p" id="sgs">' + T('sg_save') + '</button></div></div>');
   var c = $('sgc'), r = c.getBoundingClientRect(), k = window.devicePixelRatio || 1;
   c.width = r.width * k; c.height = r.height * k;
@@ -424,6 +424,9 @@ function sigPad(o) {
   c.onpointerdown = function (e) { down = true; var p = pt(e); x.beginPath(); x.moveTo(p[0], p[1]); c.setPointerCapture(e.pointerId); };
   c.onpointermove = function (e) { if (!down) return; var p = pt(e); x.lineTo(p[0], p[1]); x.stroke(); drawn = true; };
   c.onpointerup = c.onpointercancel = function () { down = false; };
+  // iOS: barmoq harakati sahifani surmasin — faqat chiziq chizilsin
+  ['touchstart', 'touchmove'].forEach(function (ev) { c.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false }); });
+  noSwipe(true);
   $('sgx').onclick = clear;
   $('sgs').onclick = function () {
     if (!drawn) { hap('heavy'); return toast(T('sg_empty')); }
@@ -448,6 +451,9 @@ function load() {
 HM.sig = sigPad; HM.sos = sos; HM.objs = objs; HM.obj = obj; HM.reqs = reqs; HM.calc = calc; HM.ref = ref; HM.contacts = contacts; HM.reload = function () { D = null; load(); };
 HM.lang = function () { L = L === 'uz' ? 'ru' : 'uz'; api('lang', { l: L }); stack = []; home(); };
 if (tg) { tg.ready(); tg.expand(); tg.onEvent('themeChanged', theme); tg.BackButton.onClick(back); }
+// Pastga surish bilan ilova yopilib/qimirlab ketmasin (imzo, skaner, ro'yxatlar). Telegram 7.7+; eskida jim o'tadi.
+function noSwipe(on) { try { if (!tg) return; if (on) { if (tg.disableVerticalSwipes) tg.disableVerticalSwipes(); } else if (tg.enableVerticalSwipes) tg.enableVerticalSwipes(); } catch (e) {} }
+noSwipe(true);
 theme(); load();
 })();
 </script>
