@@ -80,7 +80,7 @@
       s_one: 'SN shtrix-kodiga tuting — topilishi bilan botga yuboriladi.',
       torch_on: '🔦 Chiroq', torch_off: '🔦 O\'chirish', manual: '✍️ Qo\'lda', ph: 'SN yozing',
       empty: 'Hali hech narsa skanerlanmadi', send: 'Yuborish', added: '✅ Qo\'shildi: ', dup: '↺ Allaqachon ro\'yxatda: ',
-      extra: '➕ Model kodi biriktirildi: ', only_code: 'Bu SN emas (model kodi). Endi SN ni skanerlang.',
+      extra: '➕ Shu qurilmaga biriktirildi: ', only_code: 'Bu SN emas (model/MAC/GPON/PIN). Endi qurilma S/N ini skanerlang — biriktiraman.',
       cam_err: "Kamerani ochib bo'lmadi. Telegram'ga kameraga ruxsat bering yoki SN'ni qo'lda yozing.",
       tag_mat: 'material', tag_ean: 'EAN'
     },
@@ -90,7 +90,7 @@
       s_one: 'Наведите на штрих-код SN — как только найдётся, отправится в бот.',
       torch_on: '🔦 Фонарь', torch_off: '🔦 Выключить', manual: '✍️ Вручную', ph: 'Введите SN',
       empty: 'Пока ничего не отсканировано', send: 'Отправить', added: '✅ Добавлено: ', dup: '↺ Уже в списке: ',
-      extra: '➕ Код модели привязан: ', only_code: 'Это не SN (код модели). Теперь отсканируйте SN.',
+      extra: '➕ Привязано к устройству: ', only_code: 'Это не SN (модель/MAC/GPON/PIN). Отсканируйте S/N устройства — привяжу.',
       cam_err: 'Не удалось открыть камеру. Разрешите Telegram доступ к камере или введите SN вручную.',
       tag_mat: 'материал', tag_ean: 'EAN'
     }
@@ -115,6 +115,14 @@
     var s = 0; for (var i = 0; i < 12; i++) s += (+d.charAt(i)) * (i % 2 ? 3 : 1);
     return (10 - s % 10) % 10 === +d.charAt(12);
   }
+  // Router/ONT yorlig'i: GPON SN (TPLG1A2B3C4D yoki 54504C47...) va Wi-Fi (WPS) PIN — shu qurilmaga qo'shimcha kod
+  var GPON_V = /^(TPLG|TPLK|ZTEG|ZTEX|HWTC|HWTT|ALCL|FHTT|GPON|ZNTS|YHTC|DSNW|HUMA|SKYW|CDTC|ELTX|NOKG|ALLG|BDCM|CIOT|UBNT|SCOM|RTKG|ICTR|GMTK|HALN|XPON|KAON|ASKY|PTIN|MSTC|LEOX|VSOL|CXNK|SMBS|ITBS|GNXS|TWCS|SPGA|ZYXL|DLNK|TDTC)$/;
+  function gponOf(u) {
+    if (/^[A-Z]{4}[0-9A-F]{8}$/.test(u) && GPON_V.test(u.slice(0, 4))) return u;
+    if (/^[0-9A-F]{16}$/.test(u)) { var b = u.slice(0, 8).match(/../g).map(function (h) { return parseInt(h, 16); }); if (b.every(function (c) { return c >= 65 && c <= 90; })) return String.fromCharCode.apply(null, b) + u.slice(8); }
+    return '';
+  }
+  function wpsOk(p) { if (!/^\d{8}$/.test(p)) return false; var a = 0; for (var i = 0; i < 8; i++) a += (+p.charAt(i)) * (i % 2 === 0 ? 3 : 1); return a % 10 === 0; }
   function wifiParse(t) {   // WIFI:T:WPA;S:nom;P:parol;;
     var out = {}, re = /([TSPH]):((?:\\.|[^;])*);/g, m;
     while ((m = re.exec(t.slice(5)))) out[m[1]] = m[2].replace(/\\(.)/g, '$1');
@@ -139,11 +147,14 @@
     var u = t.replace(/[()\s]/g, '');
     var f = String(fmt || '');
     if (/^([0-9A-F]{2}[:\-]){5}[0-9A-F]{2}$/.test(u) || (/^[0-9A-F]{12}$/.test(u) && /[A-F]/.test(u))) return { k: 'mac', v: u.replace(/[:\-]/g, '') };
+    var gp = gponOf(u.replace(/-/g, ''));
+    if (gp) return { k: 'gpon', v: gp };
     if (/^\d+$/.test(u)) {
       if (/^(EAN|UPC)/.test(f)) return { k: 'ean', v: u };
       if (u.length === 9 && u.charAt(0) === '3') return { k: 'mat', v: u };   // Hikvision material kodi
       if (!f && (u.length === 13 || u.length === 12) && eanOk(u)) return { k: 'ean', v: u };
       if (!f && u.length === 8 && /^(69|46|47|48)/.test(u)) return { k: 'ean', v: u };
+      if (u.length === 8 && wpsOk(u)) return { k: 'pin', v: u };              // router Wi-Fi PIN
       if (u.length >= 6 && u.length <= 16) return { k: 'sn', v: u };         // raqamli SN (ZTE, eski DVR)
       return null;
     }
@@ -176,6 +187,8 @@
       if (it.mat) tags.push(TX.tag_mat + ' ' + it.mat);
       if (it.ean) tags.push(TX.tag_ean + ' ' + it.ean);
       if (it.mac) tags.push('MAC ' + it.mac);
+      if (it.gpon) tags.push('GPON ' + it.gpon);
+      if (it.pin) tags.push('PIN ' + it.pin);
       if (it.ssid) tags.push('Wi-Fi ' + it.ssid);
       if (tags.length) { var tg2 = document.createElement('span'); tg2.className = 'tag'; tg2.textContent = tags.join(' · '); s.appendChild(tg2); }
       var x = document.createElement('button'); x.className = 'x'; x.textContent = '✕';
@@ -197,7 +210,7 @@
     if (sent || !items.length) return;
     sent = true;
     var payload = JSON.stringify({ v: 1, m: MODE, items: items.slice(0, 40).map(function (x) {
-      return { sn: x.sn, mat: x.mat || '', ean: x.ean || '', mac: x.mac || '', ver: x.ver || '', model: x.model || '', ssid: x.ssid || '', wpass: x.wpass || '' };
+      return { sn: x.sn, mat: x.mat || '', ean: x.ean || '', mac: x.mac || '', ver: x.ver || '', model: x.model || '', ssid: x.ssid || '', wpass: x.wpass || '', gpon: x.gpon || '', pin: x.pin || '' };
     }) });
     stop();
     if (Q.get('embed') === '1' && window.parent !== window) { window.parent.postMessage({ hmScan: payload }, '*'); return; }   // HM-Connect ilovasi ichida
@@ -218,7 +231,7 @@
       if (seen[key]) { if (now - (seen[key]) > 2500) { flash(TX.dup + c.v, 'warn'); seen[key] = now; } return; }
       seen[key] = now;
       var it = { sn: c.v, t: now };
-      ['mat', 'ean', 'mac'].forEach(function (k) { if (pending[k]) it[k] = pending[k]; });
+      ['mat', 'ean', 'mac', 'gpon', 'pin'].forEach(function (k) { if (pending[k]) it[k] = pending[k]; });
       if (pending.ssid) { it.ssid = pending.ssid; it.wpass = pending.wpass; }
       if (c.ver) it.ver = c.ver;
       if (c.model) it.model = c.model;
@@ -232,7 +245,8 @@
     seen[key] = now;
     var last = items[items.length - 1];
     var label = c.k === 'wifi' ? 'Wi-Fi ' + c.ssid : c.v;
-    if (last && now - lastAt < 6000 && attach(last, c)) { flash(TX.extra + label, 'ok'); render(); haptic('success'); return true; }
+    var win = (c.k === 'gpon' || c.k === 'pin' || c.k === 'mac') ? 20000 : 6000;   // router yorlig'i kodlari — bir qurilmaniki
+    if (last && now - lastAt < win && attach(last, c)) { flash(TX.extra + label, 'ok'); render(); haptic('success'); return true; }
     if (c.k === 'wifi') { pending.ssid = c.ssid; pending.wpass = c.wpass; } else pending[c.k] = c.v;
     flash(TX.only_code, 'warn');
   }

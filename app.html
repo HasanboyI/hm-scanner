@@ -91,7 +91,7 @@ var LOGO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEB
 var D = null, L = Q.get('l') || 'uz', stack = [];
 var TX = {
 uz: { tag: 'Kuzatuv tizimlari va tarmoq', s_done: 'bajarilgan ish', s_dev: "o'rnatilgan qurilma", s_obj: 'obyekt', hi: 'Assalomu alaykum, {0}!', since: 'Siz bilan {0}-yildan beri', last: 'Oxirgi xizmat: {0}', war: '🛡 Garantiya: {0} kun qoldi', sos: 'Usta chaqirish', sos_s: "Muammoni tanlang — 30 soniya. Ovozli xabar ham bo'ladi", objs: 'Obyektlarim', objs_s: '{0} obyekt · {1} kamera', reqs: 'Mening ishlarim', reqs_s: "so'rovlar va holati", calc: 'Narx hisoblash', calc_s: '3 xil variant', wc: 'Kafolat taloni', wc_s: 'PDF', ref: "Do'st taklif qiling", ref_s: 'bonus oling', ct: "Bog'lanish", ct_s: "qo'ng'iroq · Telegram", active: '{0} faol',
-  f_obj: 'Obyekt', f_kind: 'Muammo nima?', f_when: 'Qachon qulay?', w_today: 'Bugun', w_tom: 'Ertaga', w_agree: 'Kelishamiz', f_note: 'Izoh (ixtiyoriy)', f_loc: '📍 Lokatsiyani qo\'shish (ixtiyoriy)', f_loc_ok: '✅ Lokatsiya qo\'shildi', f_ph: "Masalan: 2-kamera tunda ko'rsatmayapti", f_media: "🎤 Ovozli xabar, rasm yoki video — yuborgach chatga tashlang, so'rovga qo'shiladi.", send: '✅ Yuborish', pick_kind: 'Muammo turini tanlang',
+  f_obj: 'Obyekt', f_kind: 'Muammo nima? (ixtiyoriy)', f_when: 'Qachon qulay?', w_today: 'Bugun', w_tom: 'Ertaga', w_agree: 'Kelishamiz', f_note: 'Izoh (ixtiyoriy)', f_loc: '📍 Lokatsiyani qo\'shish (ixtiyoriy)', f_loc_ok: '✅ Lokatsiya qo\'shildi', f_ph: "Masalan: 2-kamera tunda ko'rsatmayapti", f_media: "🎤 Ovozli xabar, rasm yoki video — yuborgach chatga tashlang, so'rovga qo'shiladi.", send: '✅ Yuborish', pick_kind: 'Muammo turini tanlang', sg_t: '✍️ Imzo', sg_me: "Imzoingiz bir marta saqlanadi va hamma aktlarga avtomatik qo'yiladi.", sg_cl: "Mijoz imzosi — akt shu imzo bilan chatga yuboriladi.", sg_hint: 'Barmoq bilan shu yerga imzo chizing', sg_clear: '🧽 Tozalash', sg_save: '✅ Saqlash', sg_empty: 'Avval imzo chizing', sg_tile: 'Imzom',
   sent: "✅ So'rov yuborildi", sent_s: "{0} · Usta tez orada bog'lanadi. Holatini «Mening ishlarim»da kuzatasiz.", home: '🏠 Bosh sahifa', to_chat: '💬 Chatga o\'tish',
   k: { cam: "📹 Kamera ko'rsatmayapti", app: '📱 Telefonda ochilmayapti', pw: '🔑 Parolni unutdim', net: '🌐 Internet / Wi-Fi', new: "➕ Qo'shimcha kamera", other: '✍️ Boshqa' },
   st: { yangi: 'Yangi', qabul: 'Qabul qilindi', "yo'lda": "Usta yo'lda", bajarildi: 'Bajarildi', bekor: 'Bekor' },
@@ -103,7 +103,7 @@ uz: { tag: 'Kuzatuv tizimlari va tarmoq', s_done: 'bajarilgan ish', s_dev: "o'rn
   tasks: 'Mening vazifalarim', no_tasks: "Ochiq vazifa yo'q 👍", route: '🗺 Bugungi marshrut', oreqs: "Ochiq so'rovlar", no_oreqs: "Ochiq so'rov yo'q 👍", late: "muddati o'tgan", today: 'bugun', open: 'Ochish', done: '✅ Bajarildi', accept: '✅ Qabul qilish', onway: "🚗 Yo'ldaman", write: '💬 Mijozga yozish', media: '📎 Media', smeta: '📄 Smeta', invite: '📣 Taklif yuborish', newobj: "Yangi obyekt", panel: 'Boshqaruv', loc: '📍',
   to_chat_t: '✅ Chatga yuborildi', all: "Barcha bo'limlar", all_s: 'bot menyusi — hammasi shu yerda', more: "Boshqa bo'limlar", more_s: 'bonus, til, aloqa…', ph_in: 'Yozing…', srch: 'Qidirish: nom, telefon, IP, SN', go: 'Topish', wait: '⏳ …', hidden: '🔒 Xavfsizlik uchun yashirildi', ttl_s: '🔒 {0} soniyadan keyin yashiriladi', doc_chat: '📄 Telegram chatga ham yuborildi', open_doc: "👁 Ko'rish", close: '✖️ Yopish', big: 'Fayl juda katta (20 MB gacha)', loc_err: "Joylashuvni olib bo'lmadi", err: "Xatolik. Internetni tekshirib, qayta urinib ko'ring.", err_auth: 'Ilovani botdagi tugma orqali qayta oching.', err_cfg: "Ilova sozlanmagan (api manzili yo'q).", lang: "🌐 O'zbekcha · Русский" },
 ru: { tag: 'Видеонаблюдение и сети', s_done: 'выполненных работ', s_dev: 'установлено устройств', s_obj: 'объектов', hi: 'Здравствуйте, {0}!', since: 'С нами с {0} года', last: 'Последний сервис: {0}', war: '🛡 Гарантия: осталось {0} дн.', sos: 'Вызвать мастера', sos_s: 'Выберите проблему — 30 секунд. Можно голосовым', objs: 'Мои объекты', objs_s: '{0} объект · {1} камер', reqs: 'Мои заявки', reqs_s: 'заявки и их статус', calc: 'Расчёт цены', calc_s: '3 варианта', wc: 'Гарантийный талон', wc_s: 'PDF', ref: 'Пригласите друга', ref_s: 'получите бонус', ct: 'Контакты', ct_s: 'звонок · Telegram', active: '{0} активн.',
-  f_obj: 'Объект', f_kind: 'Что случилось?', f_when: 'Когда удобно?', w_today: 'Сегодня', w_tom: 'Завтра', w_agree: 'Договоримся', f_note: 'Комментарий (необязательно)', f_loc: '📍 Добавить геопозицию (необязательно)', f_loc_ok: '✅ Геопозиция добавлена', f_ph: 'Например: 2-я камера не показывает ночью', f_media: '🎤 Голосовое, фото или видео — после отправки пришлите в чат, оно добавится к заявке.', send: '✅ Отправить', pick_kind: 'Выберите тип проблемы',
+  f_obj: 'Объект', f_kind: 'Что случилось? (необязательно)', f_when: 'Когда удобно?', w_today: 'Сегодня', w_tom: 'Завтра', w_agree: 'Договоримся', f_note: 'Комментарий (необязательно)', f_loc: '📍 Добавить геопозицию (необязательно)', f_loc_ok: '✅ Геопозиция добавлена', f_ph: 'Например: 2-я камера не показывает ночью', f_media: '🎤 Голосовое, фото или видео — после отправки пришлите в чат, оно добавится к заявке.', send: '✅ Отправить', pick_kind: 'Выберите тип проблемы', sg_t: '✍️ Подпись', sg_me: 'Подпись сохраняется один раз и ставится во все акты.', sg_cl: 'Подпись клиента — акт с ней придёт в чат.', sg_hint: 'Распишитесь пальцем здесь', sg_clear: '🧽 Очистить', sg_save: '✅ Сохранить', sg_empty: 'Сначала распишитесь', sg_tile: 'Моя подпись',
   sent: '✅ Заявка отправлена', sent_s: '{0} · Мастер скоро свяжется. Статус — в «Мои заявки».', home: '🏠 Главная', to_chat: '💬 Перейти в чат',
   k: { cam: '📹 Камера не показывает', app: '📱 Не открывается в телефоне', pw: '🔑 Забыл пароль', net: '🌐 Интернет / Wi-Fi', new: '➕ Нужна ещё камера', other: '✍️ Другое' },
   st: { yangi: 'Новая', qabul: 'Принята', "yo'lda": 'Мастер в пути', bajarildi: 'Выполнена', bekor: 'Отменена' },
@@ -157,7 +157,7 @@ function cardHtml(c) {
   if (kb && kb.length) {
     h += '<div class="ikb">' + kb.map(function (row, ri) {
       return '<div class="ikr">' + row.map(function (b, bi) {
-        if (b.web_app && !/scan|index\.html|\?m=/.test(b.web_app.url)) return '';
+        if (b.web_app && !/scan|index\.html|\?m=|[?&]sig=/.test(b.web_app.url)) return '';
         return '<button data-c="' + c.id + '" data-r="' + ri + '" data-b="' + bi + '">' + esc(b.text) + '</button>';
       }).join('') + '</div>';
     }).join('') + '</div>';
@@ -215,7 +215,7 @@ function onCardClick(e) {
     var b = c2.kb.inline_keyboard[+t.dataset.r][+t.dataset.b];
     if (b.callback_data) { if (b.callback_data === 'noop') return; return send({ t: 'cb', d: b.callback_data, mid: c2.id }); }
     if (b.url) return openUrl(b.url);
-    if (b.web_app) return openScanner(b.web_app.url);
+    if (b.web_app) { var sm = b.web_app.url.match(/[?&]sig=([^&]+)(?:.*[?&]al=(uz|ru))?/); if (sm) return go(sigPad, { what: decodeURIComponent(sm[1]), al: sm[2] || L }); return openScanner(b.web_app.url); }
     if (b.copy_text) { try { navigator.clipboard.writeText(b.copy_text.text); toast(T('copied')); } catch (x) {} }
   }
 }
@@ -309,7 +309,6 @@ function sos(oid) {
   $('fw').onclick = function (e) { var b = e.target.closest('[data-w]'); if (!b) return; F.when = b.dataset.w; [].forEach.call($('fw').children, function (x) { x.classList.toggle('on', x === b); }); hap(); };
   $('fl').onclick = function () { pickLoc(function (lat, lon) { F.lat = lat; F.lon = lon; $('fl').textContent = T('f_loc_ok'); hap(); }); };
   $('fs').onclick = function () {
-    if (!F.kind) { hap('heavy'); return toast(T('pick_kind')); }
     if ($('fo')) F.oid = $('fo').value;
     $('fs').disabled = true; $('fs').textContent = '…';
     api('req', { oid: F.oid, kind: F.kind, when: F.when, text: $('fn').value, lat: F.lat, lon: F.lon }).then(function (r) {
@@ -401,12 +400,39 @@ function staffHome() {
   render(header(D.brand, D.name) + '<div class="wrap">' +
     '<div class="srch"><input type="text" id="sq" placeholder="' + esc(T('srch')) + '"><button id="sg">' + T('go') + '</button></div>' +
     '<div class="grid">' + tile('☰', T('all'), T('all_s'), "HM.bot('/menu')") + tile('➕', T('newobj'), '', "HM.bot(" + JSON.stringify(D.staff.newObjBtn || '') .replace(/"/g, "'") + ")") + '</div><div style="height:10px"></div>' +
-    '<div class="grid">' + tile('🗺', nt(T('route')), '', "HM.run('tk:route')") + tile('📄', nt(T('smeta')), '', "HM.run('sm:new')") + '</div>' +
+    '<div class="grid">' + tile('🗺', nt(T('route')), '', "HM.run('tk:route')") + tile('📄', nt(T('smeta')), '', "HM.run('sm:new')") + '</div><div style="height:10px"></div>' +
+    '<div class="grid">' + tile('✍️', T('sg_tile'), '', "HM.go(HM.sig,{what:'me'})") + '</div>' +
     '<div class="sec">' + T('oreqs') + ' (' + s.reqs.length + ')</div>' + reqs +
     '<div class="sec">' + T('tasks') + ' (' + s.tasks.length + ')</div>' + tasks +
     (s.isSuper ? '<div class="grid" style="margin-top:12px">' + tile('📣', nt(T('invite')), '', "HM.run('iv:n')") + tile('👑', T('panel'), '', "HM.bot(" + JSON.stringify(D.staff.panelBtn || '').replace(/"/g, "'") + ")") + '</div>' : '') + langFoot() + '</div>');
   $('sg').onclick = function () { var v = $('sq').value.trim(); if (v) botView({ t: 'text', text: v }); };
   $('sq').onkeydown = function (e) { if (e.key === 'Enter') $('sg').click(); };
+}
+
+// ---------------- ✍️ IMZO (usta — bir marta; mijoz — akt uchun, ixtiyoriy) ----------------
+function sigPad(o) {
+  var me = o.what === 'me';
+  render(header(T('sg_t'), me ? D.name : o.what) + '<div class="wrap"><div class="note">' + (me ? T('sg_me') : T('sg_cl')) + '</div>' +
+    '<canvas id="sgc" style="width:100%;height:220px;background:#fff;border-radius:12px;touch-action:none;display:block;margin:10px 0"></canvas>' +
+    '<div class="note" style="text-align:center">' + T('sg_hint') + '</div><div class="acts"><button id="sgx">' + T('sg_clear') + '</button><button class="p" id="sgs">' + T('sg_save') + '</button></div></div>');
+  var c = $('sgc'), r = c.getBoundingClientRect(), k = window.devicePixelRatio || 1;
+  c.width = r.width * k; c.height = r.height * k;
+  var x = c.getContext('2d'), drawn = false, down = false;
+  function clear() { x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.strokeStyle = '#10213a'; x.lineWidth = 2.6 * k; x.lineCap = 'round'; x.lineJoin = 'round'; drawn = false; }
+  function pt(e) { var b = c.getBoundingClientRect(); return [(e.clientX - b.left) * k, (e.clientY - b.top) * k]; }
+  clear();
+  c.onpointerdown = function (e) { down = true; var p = pt(e); x.beginPath(); x.moveTo(p[0], p[1]); c.setPointerCapture(e.pointerId); };
+  c.onpointermove = function (e) { if (!down) return; var p = pt(e); x.lineTo(p[0], p[1]); x.stroke(); drawn = true; };
+  c.onpointerup = c.onpointercancel = function () { down = false; };
+  $('sgx').onclick = clear;
+  $('sgs').onclick = function () {
+    if (!drawn) { hap('heavy'); return toast(T('sg_empty')); }
+    var png = c.toDataURL('image/png'), b = $('sgs'); b.disabled = true; b.textContent = '⏳';
+    var d = me ? 'sg:p' : 'aks:' + o.what + ':' + (o.al || L), out = [];
+    api('m', { t: 'cb', d: d }).then(function (r1) { out = out.concat(r1.out || []); return api('m', { t: 'file', b64: png, name: 'imzo.png' }); })
+      .then(function (r2) { out = out.concat(r2.out || []); if (!r2.ok && !(r2.out && r2.out.length)) { b.disabled = false; b.textContent = T('sg_save'); return toast(T('err')); } applyOut(out); stack.pop(); botView(null); })
+      .catch(function () { b.disabled = false; b.textContent = T('sg_save'); toast(T('err')); });
+  };
 }
 
 // ---------------- Yuklash ----------------
@@ -416,9 +442,10 @@ function load() {
   api('home').then(function (r) {
     if (!r.ok) { render('<div class="center"><div class="big">⚠️</div>' + (r.err === 'auth' ? T('err_auth') : T('err')) + '</div>'); return; }
     D = r; L = r.lang || L; stack = []; home();
+    if (Q.get('sig') && D.role === 'staff') { go(sigPad, { what: Q.get('sig'), al: Q.get('al') || L }); }
   }).catch(function () { render('<div class="center"><div class="big">⚠️</div>' + T('err') + '<br><br><button class="mbtn" onclick="HM.reload()">↻</button></div>'); });
 }
-HM.sos = sos; HM.objs = objs; HM.obj = obj; HM.reqs = reqs; HM.calc = calc; HM.ref = ref; HM.contacts = contacts; HM.reload = function () { D = null; load(); };
+HM.sig = sigPad; HM.sos = sos; HM.objs = objs; HM.obj = obj; HM.reqs = reqs; HM.calc = calc; HM.ref = ref; HM.contacts = contacts; HM.reload = function () { D = null; load(); };
 HM.lang = function () { L = L === 'uz' ? 'ru' : 'uz'; api('lang', { l: L }); stack = []; home(); };
 if (tg) { tg.ready(); tg.expand(); tg.onEvent('themeChanged', theme); tg.BackButton.onClick(back); }
 theme(); load();
