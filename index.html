@@ -69,6 +69,7 @@
   </div>
   <ul id="list"></ul>
   <div class="empty" id="empty"></div>
+  <div id="ver" style="text-align:center;font-size:11px;color:var(--hint);margin:14px 0 90px"></div>
 </div>
 <div class="fallback" id="fallback"><button class="pri" id="sendBtn"></button></div>
 
@@ -109,6 +110,8 @@
   $('manualBtn').textContent = TX.manual;
   $('manualIn').placeholder = TX.ph;
   $('empty').textContent = TX.empty;
+  // Versiya va rasm holati — yangilanish yetib kelganini tekshirish uchun
+  setTimeout(function () { $('ver').textContent = 'HM-Connect skaner v4.8 · ' + (PH ? (LANG === 'ru' ? '📸 фото наклейки: вкл' : "📸 yorliq rasmi: yoqiq") : (LANG === 'ru' ? '📸 фото выкл — откройте сканер заново из бота (кнопка «Добавить устройство»)' : "📸 rasm o'chiq — skanerni botdan qayta oching («Qurilma qo'shish» tugmasi)")); }, 0);
   document.documentElement.lang = LANG;
 
   // ---------- Kodni ajratish (bot ham xuddi shunday tekshiradi) ----------
