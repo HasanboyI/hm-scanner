@@ -39,6 +39,10 @@
   li .sn { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; font-weight: 600; flex: 1; word-break: break-all; }
   li .tag { font-size: 11px; color: var(--hint); display: block; font-weight: 400; font-family: inherit; }
   li .x { background: transparent; padding: 4px 8px; color: var(--hint); font-size: 18px; }
+  li .th { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex: none; margin-right: 8px; position: relative; }
+  li .ph { position: relative; flex: none; }
+  li .ph i { position: absolute; right: 2px; bottom: -2px; font-style: normal; font-size: 12px; }
+  li .re { background: transparent; padding: 4px 6px; font-size: 18px; }
   .manual { display: none; gap: 8px; margin-bottom: 10px; }
   .manual.on { display: flex; }
   .manual input { flex: 1; border-radius: 10px; border: 1px solid var(--bg2); background: var(--bg2); color: var(--tx); padding: 10px; font-size: 16px; text-transform: uppercase; }
@@ -82,7 +86,7 @@
       empty: 'Hali hech narsa skanerlanmadi', send: 'Yuborish', added: '✅ Qo\'shildi: ', dup: '↺ Allaqachon ro\'yxatda: ',
       extra: '➕ Shu qurilmaga biriktirildi: ', only_code: 'Bu SN emas (model/MAC/GPON/PIN). Endi qurilma S/N ini skanerlang — biriktiraman.',
       cam_err: "Kamerani ochib bo'lmadi. Telegram'ga kameraga ruxsat bering yoki SN'ni qo'lda yozing.",
-      tag_mat: 'material', tag_ean: 'EAN'
+      tag_mat: 'material', tag_ean: 'EAN', ph_wait: '📸 Yorliq rasmlari yuklanmoqda…', ph_re: '📸 Rasm qayta olindi'
     },
     ru: {
       t_multi: '📷 Сканирование подряд', t_one: '📷 Сканирование',
@@ -92,7 +96,7 @@
       empty: 'Пока ничего не отсканировано', send: 'Отправить', added: '✅ Добавлено: ', dup: '↺ Уже в списке: ',
       extra: '➕ Привязано к устройству: ', only_code: 'Это не SN (модель/MAC/GPON/PIN). Отсканируйте S/N устройства — привяжу.',
       cam_err: 'Не удалось открыть камеру. Разрешите Telegram доступ к камере или введите SN вручную.',
-      tag_mat: 'материал', tag_ean: 'EAN'
+      tag_mat: 'материал', tag_ean: 'EAN', ph_wait: '📸 Загружаю фото наклеек…', ph_re: '📸 Фото переснято'
     }
   }[LANG];
 
@@ -184,6 +188,7 @@
       var tags = [];
       if (it.model) tags.push(it.model);
       if (it.ver) tags.push('ver ' + it.ver);
+      if (it.imei) tags.push('IMEI ' + it.imei);
       if (it.mat) tags.push(TX.tag_mat + ' ' + it.mat);
       if (it.ean) tags.push(TX.tag_ean + ' ' + it.ean);
       if (it.mac) tags.push('MAC ' + it.mac);
@@ -193,7 +198,12 @@
       if (tags.length) { var tg2 = document.createElement('span'); tg2.className = 'tag'; tg2.textContent = tags.join(' · '); s.appendChild(tg2); }
       var x = document.createElement('button'); x.className = 'x'; x.textContent = '✕';
       x.onclick = function () { delete seen['sn:' + it.sn]; items.splice(i, 1); render(); };
-      li.appendChild(n); li.appendChild(s); li.appendChild(x); ul.appendChild(li);
+      li.appendChild(n);
+      if (it.thumb) { var pw = document.createElement('span'); pw.className = 'ph'; var im = document.createElement('img'); im.className = 'th'; im.src = it.thumb; pw.appendChild(im);
+        var st = document.createElement('i'); st.textContent = it.ph === 'ok' ? '✅' : it.ph === 'err' ? '⚠️' : '⏳'; pw.appendChild(st); li.appendChild(pw); }
+      li.appendChild(s);
+      if (PH) { var re = document.createElement('button'); re.className = 're'; re.textContent = '📸'; re.onclick = function () { shoot(it); flash(TX.ph_re, 'ok'); haptic('success'); }; li.appendChild(re); }
+      li.appendChild(x); ul.appendChild(li);
     });
     $('empty').style.display = items.length ? 'none' : 'block';
     var label = TX.send + ' (' + items.length + ')';
@@ -206,11 +216,42 @@
     }
   }
 
+  // ---------- 📸 Yorliq rasmi: kod o'qilgan kadr botga yuklanadi, rasmdan o'qilganlar shu qurilmaga qo'shiladi ----------
+  var API = Q.get('api') || '', TOK = Q.get('t') || '', PH = !!(API && TOK), ups = {};
+  function grab() {
+    var v = $('video'); if (!v || !v.videoWidth) return '';
+    var w = v.videoWidth, h = v.videoHeight, sc = Math.min(1, 1600 / Math.max(w, h));
+    var c = document.createElement('canvas'); c.width = Math.round(w * sc); c.height = Math.round(h * sc);
+    c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.82);
+  }
+  function shoot(it) {
+    if (!PH) return;
+    var b = grab(); if (!b) return;
+    var pid = Math.random().toString(36).slice(2, 10);
+    it.pid = pid; it.thumb = b; it.ph = 'up'; render();
+    ups[pid] = fetch(API, { method: 'POST', body: JSON.stringify({ a: 'scph', t: TOK, pid: pid, sn: it.sn, b64: b }) })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (it.pid !== pid) return;
+        if (r && r.ok) { it.ph = 'ok'; var o = r.o || {}; ['model', 'ver', 'mac', 'imei', 'gpon'].forEach(function (k) { if (o[k] && !it[k]) it[k] = o[k]; }); }
+        else it.ph = 'err';
+        render();
+      })
+      .catch(function () { if (it.pid === pid) { it.ph = 'err'; render(); } });
+  }
   function send() {
     if (sent || !items.length) return;
     sent = true;
+    var pend = items.filter(function (x) { return x.ph === 'up' && ups[x.pid]; }).map(function (x) { return ups[x.pid]; });
+    if (!pend.length) return doSend();
+    flash(TX.ph_wait, 'warn');
+    if (tg && tg.MainButton && tg.MainButton.showProgress) tg.MainButton.showProgress();
+    Promise.race([Promise.all(pend), new Promise(function (r) { setTimeout(r, 30000); })]).then(doSend, doSend);
+  }
+  function doSend() {
     var payload = JSON.stringify({ v: 1, m: MODE, items: items.slice(0, 40).map(function (x) {
-      return { sn: x.sn, mat: x.mat || '', ean: x.ean || '', mac: x.mac || '', ver: x.ver || '', model: x.model || '', ssid: x.ssid || '', wpass: x.wpass || '', gpon: x.gpon || '', pin: x.pin || '' };
+      return { sn: x.sn, mat: x.mat || '', ean: x.ean || '', mac: x.mac || '', ver: x.ver || '', model: x.model || '', ssid: x.ssid || '', wpass: x.wpass || '', gpon: x.gpon || '', pin: x.pin || '', imei: x.imei || '', pid: x.ph === 'err' ? '' : (x.pid || '') };
     }) });
     stop();
     if (Q.get('embed') === '1' && window.parent !== window) { window.parent.postMessage({ hmScan: payload }, '*'); return; }   // HM-Connect ilovasi ichida
@@ -237,6 +278,7 @@
       if (c.model) it.model = c.model;
       pending = {};
       items.push(it); lastAt = now;
+      shoot(it);   // shu kadr — yorliq rasmi
       haptic('success'); flash(TX.added + c.v, 'ok'); render();
       return true;
     }
